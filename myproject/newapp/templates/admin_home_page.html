@@ -1,0 +1,354 @@
+<!-- This HTML file represents the Admin Dashboard of TALKSCRIBE, a web application. Below are detailed explanations of the JavaScript functions used in this file, as well as the corresponding server-side views responsible for handling the data.
+
+1. addNewLanguage(): This function is triggered when the user clicks the "Add" button to add a new language. It sends an AJAX request to the backend to check if the selected language can be added and updates the UI accordingly.
+
+    - It retrieves the selected language from the dropdown menu.
+    - It fetches the CSRF token from the cookies using the getCsrfToken() function.
+    - It sends an AJAX POST request to the backend with the selected language.
+    - If the language already exists, it displays an alert message.
+    - If the language does not exist, it adds the language to the language list in the UI and updates the language table.
+
+2. getCsrfToken(): This function retrieves the CSRF token from the cookies. It is used to include the CSRF token in the headers of AJAX requests.
+
+3. removeFromLanguageTable(language): This function removes a language from the language table in the UI when the user confirms the removal of a language.
+
+    - It receives the name of the language to be removed as input.
+    - It searches for the row corresponding to the language in the language table.
+    - If found, it removes the row from the table.
+
+4. checkLanguageStatus(): This function checks if the selected language already exists in the list of languages.
+
+    - It retrieves the selected language from the dropdown menu.
+    - It checks if the selected language exists in the list of languages displayed in the UI.
+
+5. document.querySelectorAll('.folder-button-link').forEach(folder => {...}): This block of code adds event listeners to all folder buttons in the language list. When a folder button is clicked, it extracts the language name and redirects the user to the corresponding language folder.
+
+Server-Side Views:
+1. The URLs referenced in the anchor tags (e.g., 'admin_home_page', 'add_remove', 'assign_task', etc.) correspond to various server-side views responsible for rendering different pages or handling specific actions. These views are implemented on the backend using Django (views.py).
+
+Note: Detailed explanations of the server-side views are not provided here as the HTML file primarily contains client-side JavaScript code. Server-side views are typically implemented in Python or any other backend language, and their implementation details would depend on the specific requirements and technologies being used in the TALKSCRIBE application.
+-->
+
+
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TALKSCRIBE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="{% static 'js/admin_home_page.js' %}"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+    main {
+        margin-left: 260px;
+        padding: 20px;
+    }
+
+    h2 {
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #333;
+    }
+
+    th {
+        background-color: #555;
+        color: #fff;
+        padding: 10px;
+    }
+
+    td {
+        padding: 10px;
+    }
+
+    .manage-language-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .manage-language-section select, .manage-language-section button {
+        padding: 10px;
+    }
+
+    #image-display-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    #image-container img {
+        max-width: 150px;
+        height: auto;
+    }
+
+    #folder-name-title {
+        margin-top: 20px;
+    }
+
+    #image-upload-input {
+        display: none;
+    }
+    .folder-button {
+        display: inline-block;
+        text-align: center;
+        margin: 10px; 
+        font-family: Arial, sans-serif; 
+        cursor: pointer;
+    }
+
+    .folder-icon {
+        width: 70px; 
+        height: 50px; 
+        background-color: #FFD700; 
+        border-radius: 10px 10px 0 0; 
+        position: relative;
+        padding: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .folder-icon img {
+        max-width: 100%; 
+        max-height: 100%; 
+        display: block;
+        margin: auto;
+    }
+
+    .folder-label {
+        background-color: #FFD700; 
+        padding: 5px 15px;
+        border-radius: 0 0 10px 10px; 
+        font-size: 14px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    #language-list {
+        display: flex;
+        flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+        justify-content: flex-start; /* This aligns items to the start of the container */
+        gap: 10px; /* This adds a gap between the items */
+    }
+    #language-list li {
+        flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+    }
+
+    a.button {
+        display: block;
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    a.button:hover {
+        background-color: #555;
+    }
+
+
+    #gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    }
+
+    .gallery-image {
+    width: 100%;
+    object-fit: cover;
+    }
+    #image-gallery div {
+        /* Style each image wrapper */
+        border: 1px solid #ddd;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+</style>
+
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Admin Dashboard - TALKSCRIBE</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            {% comment %} <li><a class="button" href="{% url 'admin_annotation_validation' %}">Validation</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+    
+    
+
+    <main>
+        <section>
+            <h2>Languages Overview</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Language</th>
+                        <th>No. of Images</th>
+                        <th>No. of Annotations</th>
+                        <th>No. of Annotators</th>
+                    </tr>
+                </thead>
+                <tbody id="language-table-body">
+                    {% for language_detail in language_details %}
+                        <tr>
+                            <td>{{ language_detail.language__name }}</td>
+                            <td>{{ language_detail.images_count }}</td>
+                            <td>{{ language_detail.annotations_count }}</td>
+                            <td>{{ language_detail.annotators_count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        
+        
+
+        <section>
+            <h2>Language Folders</h2>
+            <ul id="language-list">
+                
+                <!-- ... Other pre-existing languages ... -->
+                {% for language in languages %}
+                    <div class="language-folder">
+                        <a href="{% url 'language_folder' language_name=language.name %}" class="folder-button-link">
+                            <div class="folder-button">
+                                <div class="folder-icon">
+                                    <img src="{% static 'images/wired-outline-54-photo-picturelandscape-gallery.gif' %}" alt="Folder Icon">
+                                </div>
+                                <div class="folder-label">{{ language.name }}</div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+            <!-- Language Images Section -->
+            {% comment %} <section id="language-images-section">
+                <h2>Uploaded Images</h2>
+                <div id="gallery-container"></div>
+            </section> {% endcomment %}
+  
+            {% comment %} <div class="manage-language-section">
+              <label for="manage-language-dropdown">Manage Language:</label>
+              <select id="manage-language-dropdown" onchange="checkLanguageStatus()">
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Telugu">Telugu</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Kannada">Kannada</option>
+                    <option value="Malayalam">Malayalam</option>
+                    <option value="Marathi">Marathi</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Bengali">Bengali</option>
+                    <option value="Punjabi">Punjabi</option>
+                    <option value="Odia">Odia</option>
+                    <option value="Assamese">Assamese</option>
+                    <!-- Add other languages as required -->'
+                    <!-- ... Other language options ... -->
+                </select>
+                <button id="add-language-button" onclick="addNewLanguage()">Add</button>
+                <button id="remove-language-button" onclick="removeSelectedLanguage()">Remove</button>
+            </div> {% endcomment %}
+            
+        </section>
+
+        <!-- ... existing code ... -->
+
+        
+
+        <!-- New section for displaying images of the opened folder -->
+       <!-- Image Gallery Section -->
+            <div id="image-gallery" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px;">
+                <!-- Images will be added here dynamically -->
+            </div>
+
+        
+
+        <!-- ... existing code ... -->
+
+
+
+    </main>
+
+<maiN>
+    <footer>
+        <p><strong>&copy; 2023 TALKSCRIBE</strong></p>
+    </footer>
+</maiN>
+    
+</body> 
+
+</html>

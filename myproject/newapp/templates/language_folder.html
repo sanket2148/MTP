@@ -1,0 +1,340 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Language Folder</title>
+    <script src="{% static 'js/language_folder.js' %}"></script>
+    <!-- Add any required CSS or JS links here -->
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+main {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #333;
+}
+
+th {
+    background-color: #555;
+    color: #fff;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+}
+
+.manage-language-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.manage-language-section select, .manage-language-section button {
+    padding: 10px;
+}
+
+#image-display-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#image-container img {
+    max-width: 150px;
+    height: auto;
+}
+
+#folder-name-title {
+    margin-top: 20px;
+}
+
+#image-upload-input {
+    display: none;
+}
+.folder-button {
+    display: inline-block;
+    text-align: center;
+    margin: 10px; 
+    font-family: Arial, sans-serif; 
+    cursor: pointer;
+}
+
+.folder-icon {
+    width: 70px; 
+    height: 50px; 
+    background-color: #FFD700; 
+    border-radius: 10px 10px 0 0; 
+    position: relative;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon img {
+    max-width: 100%; 
+    max-height: 100%; 
+    display: block;
+    margin: auto;
+}
+
+.folder-label {
+    background-color: #FFD700; 
+    padding: 5px 15px;
+    border-radius: 0 0 10px 10px; 
+    font-size: 14px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+#language-list {
+    display: flex;
+    flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+    justify-content: flex-start; /* This aligns items to the start of the container */
+    gap: 10px; /* This adds a gap between the items */
+}
+#language-list li {
+    flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+}
+
+a.button {
+    display: block;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+a.button:hover {
+    background-color: #555;
+}
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Adjust the minmax for size */
+    grid-gap: 10px; /* Space between items */
+    padding: 10px;
+    margin: auto;
+}
+
+.image-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust the minmax values as needed */
+    gap: 16px; /* Adjust the gap size as needed */
+    padding: 16px;
+    margin: auto;
+}
+
+.gallery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2px; /* Creates space between the border and the image */
+    background: black; /* Ensure the background contrasts with the black border */
+
+}
+
+.gallery-image {
+    width: 100%;
+    height: 150px; /* Adjust height as needed */
+    object-fit: cover; /* This will cover the area without stretching the image */
+}
+
+.gallery-item-info {
+    padding: 8px;
+    text-align: center;
+    width: 100%;
+    background: #f9f9f9;
+}
+
+.item-name {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+
+.item-date, .item-size {
+    font-size: 0.8rem;
+    color: #666666;
+}
+
+.gallery-item.selected {
+    border: 5px solid #2BFD41; /* Change as per your design */
+    cursor: pointer;
+}
+
+.gallery-item {
+    position: relative; /* Ensure positioning context for absolutely positioned elements */
+}
+
+.confidential-label {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgba(255, 0, 0, 0.7); /* Red color with 70% opacity */
+    color: white;
+    padding: 3px 6px;
+    font-size: 12px;
+    border-radius: 3px;
+    z-index: 1; /* Ensure the label is above the image */
+}
+
+
+</style>
+
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Admin Dashboard - TALKSCRIBE</h1>
+    </header>
+        
+
+    
+
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+        <!-- Upload form -->
+        <form action="{% url 'upload_image' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="image" multiple>
+            <input type="hidden" name="language_name" value="{{ language_name }}">
+            <button type="submit" onclick="updateImageGallery">Upload Image</button> 
+        </form>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    
+        <div id="selected-info">Selected: <span id="selected-count">0</span> / Total: <span id="total-count">{{ images|length }}</span></div>
+            <button type="button" onclick="selectAllImages()">Select All Images</button>
+            <button type="button" onclick="downloadSelectedImages()">Download Selected</button>
+            <button type="button" onclick="deleteSelectedImages()">Delete Selected</button>
+            <button type="button" onclick="updateConfidentiality(true)">Mark as Confidential</button>
+            <button type="button" onclick="updateConfidentiality(false)">Mark as Non-Confidential</button>
+
+        <div class="gallery">
+            {% for image in images %}
+    <div class="gallery-item" data-image-id="{{ image.id }}" onclick="toggleSelection(this, '{{ image.id }}')">
+        <div class="image-container">
+            <img src="{{ image.image.url }}" alt="{{ image.title }}" class="gallery-image">
+            {% if image.is_confidential %}
+                <div class="confidential-label">Confidential</div>
+            {% endif %}
+        </div>
+        <div class="gallery-item-info">
+            <div class="item-name">{{ image.title }}</div>
+            <div class="item-date">{{ image.created_at|date:"Y-m-d" }}</div>
+            <div class="item-size">{{ image.image_size }}</div>
+        </div>
+    </div>
+{% empty %}
+    <p>No images found for this language.</p>
+{% endfor %}
+
+
+
+        </div>
+        
+        
+            
+    </main>
+
+
+    
+</body>
+</html>
+        

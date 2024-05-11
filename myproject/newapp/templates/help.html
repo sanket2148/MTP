@@ -1,0 +1,787 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software User Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        /* width: 250px; */
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        /* overflow: auto; */
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+    img {
+  max-width: 80%;
+  height: auto;
+  align-items: center;
+}
+</style>
+</head>
+<body>
+<header>
+        <h1 class="mb-3">TALKSCRIBE User Guide</h1>
+    </header>
+
+    <!-- <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            {% comment %} <li><a class="button" href="{% url 'admin_annotation_validation' %}">Validation</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav> -->
+
+
+<div class="container mt-4">
+    
+
+    <ul class="nav nav-tabs" id="userTypeTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab" aria-controls="admin" aria-selected="true">Admin</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="annotator-tab" data-bs-toggle="tab" data-bs-target="#annotator" type="button" role="tab" aria-controls="annotator" aria-selected="false">Annotator</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="researcher-tab" data-bs-toggle="tab" data-bs-target="#researcher" type="button" role="tab" aria-controls="researcher" aria-selected="false">Researcher</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="validator-tab" data-bs-toggle="tab" data-bs-target="#validator" type="button" role="tab" aria-controls="validator" aria-selected="false">Validator</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="userTypeTabContent">
+        <!-- Admin Section -->
+        <div class="tab-pane fade show active" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+            <div class="accordion mt-3" id="adminAccordion">
+                <!-- Admin-specific sections (similar to previous code) -->
+                <div class="accordion" id="guideAccordion">
+                    
+                    <h2>Demo Video</h2>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/8_yIi1tGSe4" frameborder="0" allowfullscreen></iframe>
+                    
+                    <!-- Step 1: Account Setup -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Step 1: Account Setup
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select User Type:</strong> Open the software and choose your user type from the following options: Admin, Annotator, Researcher, or Validator. As an admin, select "Admin".<br>
+                                <strong>Enter User Information:</strong> Fill in your personal details such as first name, last name, and a user ID, which will be visible to other users in the system.<br>
+                                <strong>Create a Password:</strong> Create a strong and memorable password for system access.<br>
+                                <em>Note: If registration is done under the incorrect user type, delete the account from settings and create a new one with the correct designation.</em>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Step 2: Email Verification -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Step 2: Email Verification
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Check Your Email:</strong> Check your registered email for a verification One-Time Password (OTP) after registration.<br>
+                                <strong>Enter OTP for Verification:</strong> Input the OTP in the designated field within the software to verify your account and finalize the registration process.
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Step 3: Logging In -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Step 3: Logging In
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select User Type:</strong> At the login screen, select your user type ("Admin") from the available options.<br>
+                                <strong>Enter Login Credentials:</strong> Use your registered user ID and password to log in.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Homepage After Login -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSeven">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                Admin Homepage
+                            </button>
+                        </h2>
+                        <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Overview:</strong> Upon logging in, users are directed to the homepage, which features a structured and user-friendly layout consisting of a navigation menu on the left side and multiple language folders displayed alongside a detailed table.<br>
+                                <strong>Language Folders Subsection:</strong> The homepage displays various folders organized by language. Each folder contains specific resources and settings pertinent to that language, including files and documentation relevant to tasks within the system. Users can click on a language folder to upload images (up to 99 images at a time), manage image confidentiality, and view or alter the images’ download and deletion settings. A table on the homepage provides details about the folders, including the number of images present and selected.<br>
+                                <h3>Screenshot of Admin Home Page</h3>
+                                <img src="{% static 'images/Admin_homepage.png' %}" alt="Screen of Admin Home Page">
+                                <h3>Screenshot of Admin Language Folder</h3>
+                                <img src="{% static 'images/language_admin.png' %}" alt="Screen of Admin Home Page">
+
+                            </div>
+
+                            
+                            
+                        </div>
+                    </div>
+            
+                    <!-- Step 4: Language Settings 
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Language Settings
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Access Settings:</strong> Once logged in, proceed to the settings menu.<br>
+                                <strong>Select Preferred Language:</strong> Choose the language you prefer for performing tasks like annotations or validations.
+                            </div>
+                        </div>
+                    </div> -->
+            
+                    <!-- Step 5: Start Annotation -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                Start Annotation
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Access Start Annotation Page:</strong> Navigate to the 'Start Annotation' page from the main menu.<br>
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.<br>
+                                <strong>View Assigned Images:</strong> View the images assigned to you for annotation for the selected language.<br>
+                                <string>Select Image:</strong>Select a image from the image gallery, user navigation buttons( Previous, Next) for navigate through images.<br>
+                                <strong>Start Annotation:</strong> Press the 'Start' button to begin speaking and annotating images. Annotations are created as you speak, by converting you spokend words into text(Annotation).<br>
+                                <strong>Stop and Submit:</strong> Press the "Stop" button to stop the annotation , and Press the "Submit Annotation" button to save you annotation.(you can check you annotation in the annotaitons table below).<br>
+                                <strong>Annotation Table:</strong> This table contains all the annotations you have done preiously for the selected langauge.You can edit of delete any og the annotation by clicking on the "Edit" and "Delete" buttons present in each row , accordingly.<br>
+                            </div>
+                        </div>
+                    </div>
+            
+                    <!-- Step 6: Annotating Images -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                Add / Remove
+                            </button>
+                        </h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.<br>
+                                <strong>Selecting Annotators:</strong> Drag and Drop the annotators name to whom you want to assign the annotation task for the selected langauge.
+                                <strong>Save:</strong> After selecting all the annotators you want for all languages , always press "Save Selection" button present above the language table, to save your selections. 
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 7: -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingEight">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                Assign Task
+                            </button>
+                        </h2>
+                        <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.After selecting , List of annotator you selected in the "Add / Remove" will be displayed in a table.<br>
+                                <strong>Assigning Images :</strong><br>
+                                <b>Method 1:</b> Drag and Drop the Images from gallery and drop in the annotators table , in the row of annotator to whom you want to assign the annotation task of that image.<br>
+                                <b>Method 2:</b> select the annotators name from the dropdoen to whom yo want to assign the annotation task and then enter the number of images you want to asssign(<= total number of images) adn press the "Randomly Assign" button.
+                                <strong>Save:</strong> After assigning images ,press "Save Assignment" button to save your assignments. 
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Step 7: -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingNine">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNine" aria-expanded="false" aria-controls="collapseNine">
+                                Check Annotations
+                            </button>
+                        </h2>
+                        <div id="collapseNine" class="accordion-collapse collapse" aria-labelledby="headingNine" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Check or Validate Annotation</strong>Once you go to the "Check Annotation" page , you will get two options <br>
+                                <b>1) check annotations:</b> 
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.<br>
+                                After selecting , List of images will be displayed for the selected language , once you click on any image you will find the annotation of that image in a table.
+                                You can also check the annotations according to the annotators , by click on the annotators name , after selecting the "by annotator" radio button.
+                                <strong>2) validation :</strong><br>
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.<br>
+                                After selecting the langauge you get the option to assign the validation to the avalibale validators, by selctin the name of the validator from the dropdown and entering the number of annotations to be assigned fo that validator.
+                                You can also check the validation task and validation status of the annotation from the table. 
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- step 10 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTen">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTen" aria-expanded="false" aria-controls="collapseNine">
+                                Start Annotation
+                            </button>
+                        </h2>
+                        <div id="collapseTen" class="accordion-collapse collapse" aria-labelledby="headingTen" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select Language:</strong> Use the dropdown menu to select the language.<br>
+                                After selecting the language, list of images will be displayed for the selected language. Once you click on any image, the image will be previewed in the preview box , and you can annotation that image by clicking the "start" button.Once the annotation task is done you have to clcik on the submit the annotation to save it.
+                                If you have any trouble to add the annotation using speech, you can type the annotation using the virtual keyboard, you can open it using "open Keyboard" button and selecting the lanaguge of the keyboard.
+
+                                You can also check the annotations from the annotation. you can even edit and delete the annotation, using the buttons given in each row of the annotation table. 
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- step 11 -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingAnnotatorNine">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorNine" aria-expanded="false" aria-controls="collapseAnnotatorNine">
+                                Logout and Feedback
+                            </button>
+                        </h2>
+                        <div id="collapseAnnotatorNine" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorNine" data-bs-parent="#annotatorAccordion">
+                            <div class="accordion-body">
+                                <strong>Return to Settings:</strong> To logout go back to the settings menu.<br>
+                                <strong>Provide Feedback:</strong><b>Before logging out, please add feedback about your experience or any issues you encountered. We are under development and need help to improve our experience.</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <!-- Annotator Section -->
+        <!-- Annotator Section -->
+        <div class="tab-pane fade" id="annotator" role="tabpanel" aria-labelledby="annotator-tab">
+            <div class="accordion mt-3" id="annotatorAccordion">
+                <!-- Step 1: Account Setup -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorOne" aria-expanded="true" aria-controls="collapseAnnotatorOne">
+                            Step 1: Account Setup
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorOne" class="accordion-collapse collapse show" aria-labelledby="headingAnnotatorOne" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Select User Type:</strong> Open the software and begin by selecting your user type. Choose "Annotator" for annotators like you.<br>
+                            <strong>Enter User Information:</strong> Fill in your personal details, including your first name, last name, and user ID. The user ID will be visible to other users, so choose one that you are comfortable sharing.<br>
+                            <strong>Create a Password:</strong> Create a secure password that you will use to log in to the system. Ensure it is strong and memorable.<br>
+                            <em>Note: If you accidentally register under the wrong user type, go to the settings menu, delete your account, and create a new one with the correct user type.</em>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Email Verification -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorTwo" aria-expanded="false" aria-controls="collapseAnnotatorTwo">
+                            Step 2: Email Verification
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorTwo" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorTwo" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Check your email:</strong> After registration, check your registered email for a verification OTP.<br>
+                            <strong>Enter OTP for Verification:</strong> Enter the OTP in the designated field on the software to verify your account and complete the registration process.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 to Step 9: Similar structure for remaining steps -->
+                    <!-- Step 3: Logging In -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorThree" aria-expanded="false" aria-controls="collapseAnnotatorThree">
+                            Step 3: Logging In
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorThree" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorThree" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Select User Type:</strong> On the login screen, again select your user type from the options provided.<br>
+                            <strong>Enter Login Credentials:</strong> Log in using your registered user ID and password.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Language Settings -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorFour" aria-expanded="false" aria-controls="collapseAnnotatorFour">
+                            Step 4: Language Settings
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorFour" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorFour" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Access Settings:</strong> Once logged in, navigate to the settings menu.<br>
+                            <strong>Select Preferred Language:</strong> Choose the language you prefer for performing annotations or validations.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Start Annotation -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorFive" aria-expanded="false" aria-controls="collapseAnnotatorFive">
+                            Step 5: Start Annotation
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorFive" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorFive" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Access Start Annotation Page:</strong> Navigate to the 'Start Annotation' page from the main menu.<br>
+                            <strong>Select Language:</strong> Use the drop-down menu to select the language you set up previously.<br>
+                            <strong>View Assigned Images:</strong> The images assigned to you for annotation will be displayed here.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Annotating Images -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorSix">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorSix" aria-expanded="false" aria-controls="collapseAnnotatorSix">
+                            Step 6: Annotating Images
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorSix" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorSix" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Start Annotation:</strong> Press the 'Start' button to begin speaking and annotating the images. Your annotations will be recorded as you speak.<br>
+                            <strong>Submit Annotations:</strong> After completing the annotations, press 'Submit' to save your work to the database.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 7: Editing and Deleting Annotations -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorSeven">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorSeven" aria-expanded="false" aria-controls="collapseAnnotatorSeven">
+                            Step 7: Editing and Deleting Annotations
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorSeven" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorSeven" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Edit Annotations:</strong> If you need to modify any annotations, use the 'Edit' option to make changes and add the revised version.<br>
+                            <strong>Delete Annotations:</strong> If you wish to remove any previous annotations completely, use the 'Delete' option.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 8: Check Annotations -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorEight">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorEight" aria-expanded="false" aria-controls="collapseAnnotatorEight">
+                            Step 8: Check Annotations
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorEight" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorEight" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Go to the “check annotation” page:</strong> Select the language. Click on the images, and you will find the annotations you have made on that image. If there are no annotations, an empty table will be displayed.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 9: Final Steps and Feedback -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingAnnotatorNine">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnnotatorNine" aria-expanded="false" aria-controls="collapseAnnotatorNine">
+                            Step 9: Final Steps and Feedback
+                        </button>
+                    </h2>
+                    <div id="collapseAnnotatorNine" class="accordion-collapse collapse" aria-labelledby="headingAnnotatorNine" data-bs-parent="#annotatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Return to Settings:</strong> After completing your annotations, go back to the settings menu.<br>
+                            <strong>Provide Feedback:</strong> Before logging out, please add feedback about your experience or any issues you encountered. We are under development and need help to improve our experience.
+                        </div>
+                    </div>
+                </div>
+                <!-- Fill in other steps following the example above, ensuring each step has its unique id for the header, button, and collapse elements -->
+            </div>
+        </div>
+
+
+        <!-- Researcher Section -->
+        <div class="tab-pane fade" id="researcher" role="tabpanel" aria-labelledby="researcher-tab">
+            <div class="accordion mt-3" id="researcherAccordion">
+                <!-- Researcher-specific sections -->
+                <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Step 1: Account Setup
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#guideAccordion">
+                            <div class="accordion-body">
+                                <strong>Select User Type:</strong> Open the software and choose your user type from the following options: Admin, Annotator, Researcher, or Validator. As an admin, select "Admin".<br>
+                                <strong>Enter User Information:</strong> Fill in your personal details such as first name, last name, and a user ID, which will be visible to other users in the system.<br>
+                                <strong>Create a Password:</strong> Create a strong and memorable password for system access.<br>
+                                <em>Note: If registration is done under the incorrect user type, delete the account from settings and create a new one with the correct designation.</em>
+                            </div>
+                        </div>
+                </div>
+                <!-- Step 2: Email Verification -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Step 2: Email Verification
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Check Your Email:</strong> Check your registered email for a verification One-Time Password (OTP) after registration.<br>
+                            <strong>Enter OTP for Verification:</strong> Input the OTP in the designated field within the software to verify your account and finalize the registration process.
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Step 3: Logging In -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Step 3: Logging In
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Select User Type:</strong> At the login screen, select your user type ("Admin") from the available options.<br>
+                            <strong>Enter Login Credentials:</strong> Use your registered user ID and password to log in.
+                        </div>
+                    </div>
+                </div>
+                <!-- Homepage After Login -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSeven">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                            Admin Homepage
+                        </button>
+                    </h2>
+                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Overview:</strong> Upon logging in, users are directed to the homepage, which features a structured and user-friendly layout consisting of a navigation menu on the left side and multiple language folders displayed alongside a detailed table.<br>
+                            <strong>Language Folders Subsection:</strong> The homepage displays various folders organized by language.Each language folder has images related to the languages.
+                            <!-- <img src="{% static 'images/Admin_homepage.png' %}" alt="Screen of Admin Home Page">
+                            <h3>Screenshot of Admin Language Folder</h3>
+                            <img src="{% static 'images/language_admin.png' %}" alt="Screen of Admin Home Page"> -->
+
+                        </div>                        
+                        
+                    </div>
+                </div>
+        
+                <!-- Step 4: Language Settings 
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            Language Settings
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Access Settings:</strong> Once logged in, proceed to the settings menu.<br>
+                            <strong>Select Preferred Language:</strong> Choose the language you prefer for performing tasks like annotations or validations.
+                        </div>
+                    </div>
+                </div> -->
+        
+                
+                
+        
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingResearcherLast">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseResearcherLast" aria-expanded="false" aria-controls="collapseAnnotatorNine">
+                            Logout and Feedback
+                        </button>
+                    </h2>
+                    <div id="collapseResearcherLast" class="accordion-collapse collapse" aria-labelledby="headingResearcherLast" data-bs-parent="#researcherAccordion">
+                        <div class="accordion-body">
+                            <strong>Return to Settings:</strong> To logout go back to the settings menu.<br>
+                            <strong>Provide Feedback:</strong><b>Before logging out, please add feedback about your experience or any issues you encountered. We are under development and need help to improve our experience.</b>
+                        </div>
+                    </div>
+            </div>
+            </div>
+        </div>
+        <!-- Validator Section -->
+        <div class="tab-pane fade" id="validator" role="tabpanel" aria-labelledby="validator-tab">
+            <div class="accordion mt-3" id="validatorAccordion">
+                <!-- Validator-specific sections -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            Step 1: Account Setup
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Select User Type:</strong> Open the software and choose your user type from the following options: Admin, Annotator, Researcher, or Validator. As an admin, select "Admin".<br>
+                            <strong>Enter User Information:</strong> Fill in your personal details such as first name, last name, and a user ID, which will be visible to other users in the system.<br>
+                            <strong>Create a Password:</strong> Create a strong and memorable password for system access.<br>
+                            <em>Note: If registration is done under the incorrect user type, delete the account from settings and create a new one with the correct designation.</em>
+                        </div>
+                    </div>
+                </div>
+                <!-- Step 2: Email Verification -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            Step 2: Email Verification
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Check Your Email:</strong> Check your registered email for a verification One-Time Password (OTP) after registration.<br>
+                            <strong>Enter OTP for Verification:</strong> Input the OTP in the designated field within the software to verify your account and finalize the registration process.
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Step 3: Logging In -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            Step 3: Logging In
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Select User Type:</strong> At the login screen, select your user type ("Admin") from the available options.<br>
+                            <strong>Enter Login Credentials:</strong> Use your registered user ID and password to log in.
+                        </div>
+                    </div>
+                </div>
+                <!-- Homepage After Login -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSeven">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                            Validator Homepage
+                        </button>
+                    </h2>
+                    <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#guideAccordion">
+                        <div class="accordion-body">
+                            <strong>Overview:</strong> Upon logging in, users are directed to the homepage, which features a structured and user-friendly layout consisting of a navigation menu on the left side and multiple language folders displayed alongside a detailed table.<br>
+                            <strong>Language Folders Subsection:</strong> The homepage displays various folders organized by language.Each language folder has images related to the languages.
+                            <!-- <img src="{% static 'images/Admin_homepage.png' %}" alt="Screen of Admin Home Page">
+                            <h3>Screenshot of Admin Language Folder</h3>
+                            <img src="{% static 'images/language_admin.png' %}" alt="Screen of Admin Home Page"> -->
+
+                        </div>                        
+                        
+                    </div>
+                </div>
+    
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingValidatorLast">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidatorLast" aria-expanded="false" aria-controls="collapseAnnotatorNine">
+                            Logout and Feedback
+                        </button>
+                    </h2>
+                    <div id="collapseValidatorLast" class="accordion-collapse collapse" aria-labelledby="headingValidatorLast" data-bs-parent="#validatorAccordion">
+                        <div class="accordion-body">
+                            <strong>Return to Settings:</strong> To logout go back to the settings menu.<br>
+                            <strong>Provide Feedback:</strong><b>Before logging out, please add feedback about your experience or any issues you encountered. We are under development and need help to improve our experience.</b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+    
+</div>
+</body>
+<footer>
+    <hline>
+        
+    </hline>
+</footer>
+</html>
+<!-- Remove the container if you want to extend the Footer to full width. -->
+<div class="container my-5">
+    <!-- Footer -->
+    <footer
+            class="text-center text-lg-start text-dark"
+            style="background-color: #ECEFF1"
+            >
+      <!-- 
+      <section
+               class="d-flex justify-content-between p-4 text-white"
+               style="background-color: #21D192"
+               >
+        
+        <div class="me-5">
+          <span>Get connected with us on social networks:</span>
+        </div>
+        
+        <div>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-twitter"></i>
+          </a>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-google"></i>
+          </a>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-linkedin"></i>
+          </a>
+          <a href="" class="text-white me-4">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+        
+      </section>
+      
+      <section class="">
+        <div class="container text-center text-md-start mt-5">
+          
+          <div class="row mt-3">
+            
+            <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+              
+              <h6 class="text-uppercase fw-bold">Company name</h6>
+              <hr
+                  class="mb-4 mt-0 d-inline-block mx-auto"
+                  style="width: 60px; background-color: #7c4dff; height: 2px"
+                  />
+              <p>
+                Here you can use rows and columns to organize your footer
+                content. Lorem ipsum dolor sit amet, consectetur adipisicing
+                elit.
+              </p>
+            </div>
+            
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+              
+              <h6 class="text-uppercase fw-bold">Products</h6>
+              <hr
+                  class="mb-4 mt-0 d-inline-block mx-auto"
+                  style="width: 60px; background-color: #7c4dff; height: 2px"
+                  />
+              <p>
+                <a href="#!" class="text-dark">MDBootstrap</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">MDWordPress</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">BrandFlow</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Bootstrap Angular</a>
+              </p>
+            </div>
+            
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+              
+              <h6 class="text-uppercase fw-bold">Useful links</h6>
+              <hr
+                  class="mb-4 mt-0 d-inline-block mx-auto"
+                  style="width: 60px; background-color: #7c4dff; height: 2px"
+                  />
+              <p>
+                <a href="#!" class="text-dark">Your Account</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Become an Affiliate</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Shipping Rates</a>
+              </p>
+              <p>
+                <a href="#!" class="text-dark">Help</a>
+              </p>
+            </div>
+            
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+              
+              <h6 class="text-uppercase fw-bold">Contact</h6>
+              <hr
+                  class="mb-4 mt-0 d-inline-block mx-auto"
+                  style="width: 60px; background-color: #7c4dff; height: 2px"
+                  />
+              <p><i class="fas fa-home mr-3"></i> New York, NY 10012, US</p>
+              <p><i class="fas fa-envelope mr-3"></i> info@example.com</p>
+              <p><i class="fas fa-phone mr-3"></i> + 01 234 567 88</p>
+              <p><i class="fas fa-print mr-3"></i> + 01 234 567 89</p>
+            </div>
+            
+          </div>
+          
+        </div>
+      </section>
+        -->
+      <div
+           class="text-center p-3"
+           style="background-color: rgba(0, 0, 0, 0.2)"
+           >
+        © 2020 Copyright:
+        <a class="text-dark" 
+           >Talkscribe.in</a
+          >
+      </div>
+      
+    <!-- </footer>href="https://mdbootstrap.com/" -->
+    <!-- Footer -->
+  </div>

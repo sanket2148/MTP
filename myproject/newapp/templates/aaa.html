@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - TALKSCRIBE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            display: flex;
+            justify-content: space-between;
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        #image-container, #annotator-list {
+            width: 48%;
+            padding: 20px;
+            background-color: #3333;
+            overflow-y: auto;
+            max-height: 1000px;
+        }
+        
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+        }
+
+
+
+        #image-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-gap: 10px;
+            align-items: start;
+            overflow-y: auto;
+            max-height: 90vh; /* Set the height to use up most of the viewport height */
+            padding-bottom: 1rem; /* Extra space at the bottom */
+            background-color: #3333;
+        }
+        
+        .image-box {
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .image-box img {
+            width: 100%;
+            height: 120px; /* Fixed height for images */
+            object-fit: cover; /* Resize images to cover the area */
+        }
+        
+        .image-title {
+            text-align: center;
+            font-size: 0.8em;
+            color: #333;
+            padding: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            background: #f4f4f4; /* Light background for the title */
+        }
+        .image-box.selected {
+            outline: 2px solid blue; /* or any style you want for selected images */
+        }
+        a.button {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #555;
+        }
+        .button {
+            background-color: #04AA6D; /* Green */
+            border: none;
+            color: white;
+            padding: 5px 20px;
+            text-align: center;
+            text-decoration: #333;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 2px 1px;
+            cursor: pointer;
+          }
+          /* Style for table rows */
+          tr {
+              transition: background-color 0.3s ease; /* Smooth transition for background color change */
+          }
+          
+          /* Style for rows when checkbox is selected */
+          tr.selected-row {
+              background-color: green; /* Change to red when checkbox is selected */
+          }
+          
+          /* Style for rows when checkbox is not selected */
+          tr:not(.selected-row) {
+              background-color: ; /* Default color when checkbox is not selected */
+          }
+          
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Admin Dashboard - TALKSCRIBE</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            <li><a class="button" href="{% url 'admin_annotation_validation' %}">Validation</a></li>
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+       
+        <div id="annotator-list">
+            <label for="select-language">Select Language:</label>
+            <select id="select-language" >
+                <option value="">Select a language</option>
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Telugu">Telugu</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Kannada">Kannada</option>
+                    <option value="Malayalam">Malayalam</option>
+                    <option value="Marathi">Marathi</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Bengali">Bengali</option>
+                    <option value="Punjabi">Punjabi</option>
+                    <option value="Odia">Odia</option>
+                    <option value="Assamese">Assamese</option>
+                <!-- Add more languages here -->
+            </select> 
+             <!-- Add this element to display the total number of images -->
+            <p>Total Images for Selected Language: <span id="total-images">0</span></p> 
+            <h3>Random Image Assignment:</h3>
+                
+                <label for="selected-annotator-random">Assign to Annotator:</label>
+                <select id="selected-annotator-random">
+                    <!-- Annotators for the selected language will be dynamically added here -->
+                </select>
+
+                <label for="number-of-images">Number of Images:</label>
+                <input type="number" id="number-of-images" min="1" placeholder="Enter number of images">
+                
+                <button onclick="randomlyAssignImages()">Randomly Assign</button>
+            
+             
+
+            <h2>Annotators:</h2>
+            <!-- The rest of your HTML -->
+            <!--<button id="undo-button">Undo Last Assignment</button>
+            <button id="redo-button">Redo Last Assignment</button>-->
+            <button id="undo-delete-button">Undo Deletion</button>
+            <button type="button" class="button" onclick="saveImageAssignment()"> Save Assignments</button>
+            <!-- <button id="assign-button"type="button">Assign Image</button> -->
+
+            <!-- The rest of your HTML -->
+
+            <table id="annotators-table">
+                <thead>
+                    <tr>
+                        <th>Annotator</th>
+                        <th>Assigned Images</th>
+                        <th>Validation</th>
+
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Annotators and assigned images will be displayed here --><!-- Inside the <tbody> section of the table, inside the loop -->
+                    <td><input type="checkbox" class="annotation-checkbox"></td>
+
+                </tbody>
+            </table>
+            
+        </div>
+        
+        <div id="image-container">
+            
+            <!-- Images will be displayed here -->
+        </div>
+    </main>
+
+
+
+    
+
+    
+        
+    <script>
+        document.getElementById('select-language').addEventListener('change', function() {
+            var selectedLanguage = this.value;
+            if (selectedLanguage) {
+                fetchAnnotators(selectedLanguage);
+                fetchImages(selectedLanguage);
+                console.log(typeof selectedLanguage); // Check the type
+                console.log(selectedLanguage); // Check the value
+
+            }
+        });
+        
+        function fetchAnnotators(language) {
+            console.log('fetchAnnotators:', typeof language, language); // For debugging
+            fetch(`/newapp/get_selected_annotators/${language}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.annotators.length === 0) {
+                        alert("No annotators available for this language.");
+                    } else {
+                        console.log('fetchAnnotators data:', data);
+                        updateAnnotatorsDropdown(language); // Pass the language string, not the object
+                        updateAnnotatorsTable(data.annotators);
+                        makeImagesDraggable();
+                        
+                    }
+                })
+                .catch(error => console.error('Error fetching annotators:', error));
+        }
+        
+
+        function fetchImages(language) {
+            console.log("fetchImages called with language:", language);
+            fetch(`/newapp/get_images_for_language/${language}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Images data received:", data);
+                    if (data.images.length === 0) {
+                        alert("No images available for this language.");
+                        updateImagesGallery(data.images);
+                    } else {
+                        updateImagesGallery(data.images);  // Note the change here
+                    }
+                })
+                .catch(error => console.error('Error fetching images:', error));
+        }
+        
+        
+        function updateAnnotatorsDropdown(language) {
+            console.log('updateAnnotatorsDropdown:', typeof language, language); // For debugging
+            fetch(`/newapp/get_selected_annotators/${language}`)
+                .then(response => response.json())
+                .then(data => {
+                    var annotatorSelect = document.getElementById('selected-annotator-random');
+                    annotatorSelect.innerHTML = '';
+                    data.annotators.forEach(annotator => {
+                        var option = document.createElement('option');
+                        option.value = annotator.username;
+                        option.textContent = annotator.username;
+                        annotatorSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching annotators:', error));
+        }
+        
+        
+        function updateImagesGallery(images) {
+            console.log("updateImagesGallery called with images:", images);
+            var imageContainer = document.getElementById('image-container');
+            imageContainer.innerHTML = '';
+            var relativePathToImages = '/media/';
+            
+            // Update the total number of images for the selected language
+            document.getElementById('total-images').textContent = images.length;
+            images.forEach(image => {
+                var imageBox = document.createElement('div');
+                imageBox.className = 'image-box';
+        
+                var img = document.createElement('img');
+                img.src = relativePathToImages + image.filename;
+                img.alt = image.title;
+                img.draggable = true;
+                console.log('Image URL:', relativePathToImages + image.filename);
+        
+                img.onerror = function() {
+                    console.error('Error loading image:', img.src);
+                };
+        
+                var titleDiv = document.createElement('div');
+                titleDiv.className = 'image-title';
+                titleDiv.textContent = image.title;
+        
+                imageBox.appendChild(img);
+                imageBox.appendChild(titleDiv);
+                imageContainer.appendChild(imageBox);
+            });
+        }
+
+        
+        function updateAnnotatorsTable(annotators) {
+            var tableBody = document.getElementById("annotators-table").getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            
+            annotators.forEach(annotator => {
+                var row = tableBody.insertRow();
+                
+                // Add checkbox cell
+                var checkboxCell = row.insertCell(0);
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('annotation-checkbox');
+                checkboxCell.appendChild(checkbox);
+                
+                var annotatorCell = row.insertCell(1);
+                annotatorCell.textContent = annotator.username;
+                
+                var assignedImagesCell = row.insertCell(2);
+                assignedImagesCell.setAttribute('data-annotator', annotator.username);
+                assignedImagesCell.classList.add('drop-zone');
+
+                var checkboxCell = row.insertCell(3);
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.classList.add('annotation-checkbox');
+                checkboxCell.appendChild(checkbox);
+                
+                fetchAssignedImages(annotator.username)
+                    .then(images => {
+                        images.forEach(image => {
+                            // Create a span element to display the image name
+                            var imageSpan = document.createElement('span');
+                            imageSpan.textContent = image; // Assuming 'image' contains the filename
+                            imageSpan.classList.add('clickable'); // Add a class for styling and event binding
+        
+                            // Add a click event listener to remove the image when clicked
+                            imageSpan.addEventListener('click', function() {
+                                removeImageFromAssignment(annotator.username, image);
+                            });
+        
+                            // Append the span element to the assigned images cell
+                            assignedImagesCell.appendChild(imageSpan);
+                            assignedImagesCell.appendChild(document.createTextNode(', '));
+                        });
+                    })
+                    .catch(error => console.error('Error fetching assigned images:', error));
+        
+                assignedImagesCell.addEventListener('dragover', function(event) {
+                    event.preventDefault();
+                });
+        
+                assignedImagesCell.addEventListener('drop', function(event) {
+                    event.preventDefault();
+                    var imageTitle = event.dataTransfer.getData('text/plain').trim().toLowerCase();
+                    var annotator = this.getAttribute('data-annotator'); // Get the annotator from the cell attribute
+                
+                    // Check if the image is already assigned to the annotator
+                    var alreadyAssigned = Array.from(this.querySelectorAll('span')).some(span => span.textContent.trim() === imageTitle);
+                    
+                    if (!alreadyAssigned) {
+                        // Create a new span element for the dropped image title
+                        var imageSpan = document.createElement('span');
+                        imageSpan.textContent = imageTitle;
+                        imageSpan.classList.add('clickable'); // Add a class for styling and event binding
+                
+                        // Add a click event listener to remove the image when clicked
+                        imageSpan.addEventListener('click', function() {
+                            removeImageFromAssignment(annotator, imageTitle);
+                        });
+                
+                        // Append the span element to the assigned images cell
+                        this.appendChild(imageSpan);
+                        this.appendChild(document.createTextNode(', '));
+                
+                        // Save the assignment to the server
+                        // saveAssignmentToServer(annotator, imageTitle);
+                    } else {
+                        alert("This image is already assigned to this annotator.");
+                    }
+                });
+                
+            });
+        
+            // Add event listeners to checkboxes for toggling row background color
+            var checkboxes = document.querySelectorAll('.annotation-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    var row = this.parentNode.parentNode;
+                    if (this.checked) {
+                        row.style.backgroundColor = 'red';
+                    } else {
+                        row.style.backgroundColor = 'lightcoral';
+                    }
+                });
+            });
+        }
+        
+
+        
+        function removeImageFromAssignment(annotator, imageTitle) {
+            var confirmed = confirm(`Are you sure you want to remove "${imageTitle}" from the assignment?`);
+            if (confirmed) {
+                // Remove the image from the UI
+                var assignedImagesCell = document.querySelector(`[data-annotator='${annotator}']`);
+                var spans = assignedImagesCell.querySelectorAll('span');
+                spans.forEach(span => {
+                    if (span.textContent === imageTitle) {
+                        span.parentNode.removeChild(span); // Remove the span element
+                    }
+                });
+        
+                // Remove the image from the assigned images array
+                var index = assignedImagesPerAnnotator[annotator].indexOf(imageTitle);
+                if (index !== -1) {
+                    assignedImagesPerAnnotator[annotator].splice(index, 1); // Remove the image title from the array
+                }
+        
+                // Send a request to the server to update the assignment (implement this)
+                //updateAssignmentOnServer(annotator, imageTitle);
+            }
+        }
+        
+        function fetchAssignedImages(annotator) {
+            return fetch(`/newapp/get_assigned_images/${annotator}`)
+                .then(response => response.json())
+                .then(data => data.images)
+                .catch(error => {
+                    console.error('Error fetching assigned images:', error);
+                    return [];
+                });
+        }
+        
+        
+        
+        
+
+
+                    // Example: Making images draggable
+                    function makeImagesDraggable() {
+                        var images = document.querySelectorAll('#image-container img');
+                        images.forEach(img => {
+                            img.setAttribute('draggable', true);
+                            img.addEventListener('dragstart', function(event) {
+                                // Set the image title as the drag data
+                                var imageTitle = img.alt; // Assuming the alt attribute holds the image title
+                                event.dataTransfer.setData('text/plain', imageTitle);
+                            });
+                        });
+                    }
+                    
+
+            
+
+            let assignedImagesPerAnnotator = {};
+            let currentAssignments = new Set();
+            let assignedImagesSet = new Set();
+
+            function getCurrentAssignments(annotator) {
+                currentAssignments.clear(); 
+                // Find the row for the annotator
+                const rows = document.querySelectorAll("#annotators-table tbody tr");
+                rows.forEach(row => {
+                    if (row.cells[0].textContent === annotator) {
+                        // Assuming the second cell contains assigned images
+                        const images = row.cells[1].textContent.split(", ");
+                        images.forEach(img => currentAssignments.add(img.trim().toLowerCase())); // Store titles in lowercase
+                    }
+                });
+                return currentAssignments;
+            }
+            
+
+            // Define a map to store assigned images for each annotator
+
+function assignImagesToAnnotator(images, selectedAnnotator) {
+    // Initialize the assigned images array for the selected annotator if not already initialized
+    if (!assignedImagesPerAnnotator[selectedAnnotator]) {
+        assignedImagesPerAnnotator[selectedAnnotator] = new Set();
+    }
+
+    images.forEach(image => {
+        const trimmedTitle = image.title.trim().toLowerCase();
+        const assignedImagesCell = document.querySelector(`[data-annotator='${selectedAnnotator}']`);
+
+        // Check if the image is already assigned to the selected annotator
+        if (!assignedImagesPerAnnotator[selectedAnnotator].has(trimmedTitle)) {
+            var imageSpan = document.createElement('span');
+            imageSpan.textContent = image.title;
+            assignedImagesCell.appendChild(imageSpan);
+            assignedImagesCell.appendChild(document.createTextNode(", "));
+
+            assignedImagesPerAnnotator[selectedAnnotator].add(trimmedTitle); // Update the assigned images set for the annotator
+            assignedImagesSet.add(trimmedTitle); // Update the unified set with the new assignment
+
+            // Display a notification for the new assignment
+            
+        } else {
+            console.log("This image is already assigned to this annotator.");
+        }
+    });
+
+    // Update the total number of images available for assignment
+   
+}
+
+
+            
+            
+            
+            
+
+            function randomlyAssignImages() {
+                var selectedAnnotator = document.getElementById('selected-annotator-random').value;
+                var numberOfImages = parseInt(document.getElementById('number-of-images').value);
+                var selectedLanguage = document.getElementById('select-language').value;
+                
+                // Fetch all available images for the selected language
+                fetch(`/newapp/get_images_for_language/${selectedLanguage}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Ensure data.images is an array
+                        var images = Array.isArray(data) ? data : data.images;
+                        if (isNaN(numberOfImages) || numberOfImages < 1 || !selectedAnnotator || numberOfImages > images.length) {
+                            alert("Please enter a valid number of images and ensure you've selected an annotator.");
+                            return;
+                        }
+            
+                        var assignedImagesCell = document.querySelector(`[data-annotator='${selectedAnnotator}']`);
+                        var assignedImages = Array.from(assignedImagesCell.querySelectorAll('span')).map(span => span.textContent.trim());
+
+                        var randomlySelectedImages = [];
+                        var availableImages = images.filter(image => !assignedImages.includes(image.title)); // Filter out already assigned images
+
+                        while (randomlySelectedImages.length < numberOfImages && availableImages.length > 0) {
+                            var randomIndex = Math.floor(Math.random() * availableImages.length);
+                            randomlySelectedImages.push(availableImages[randomIndex]);
+                            availableImages.splice(randomIndex, 1); // Remove the assigned image from the available list
+                        }
+            
+                        // Assign randomly selected images to the chosen annotator
+                        assignImagesToAnnotator(randomlySelectedImages, selectedAnnotator);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+
+
+            
+            ////////////////////////////////////////////////////////////////////////////////////
+
+
+            // Add this function to your script
+            function saveImageAssignment() {
+                var selectedLanguage = document.getElementById('select-language').value;
+            
+                // Create an object to store assigned images for each annotator
+                var assignedImages = {};
+            
+                // Iterate over each table row
+                var rows = document.querySelectorAll("#annotators-table tbody tr");
+                rows.forEach(row => {
+                    var annotator = row.cells[0].textContent;
+                    var assignedImagesCell = row.cells[1];
+                    
+                    // Collect assigned image titles for the annotator
+                    var images = [];
+                    assignedImagesCell.querySelectorAll('span').forEach(span => {
+                        images.push(span.textContent.trim());
+                    });
+            
+                    // Store the assigned images for the annotator
+                    assignedImages[annotator] = images;
+                });
+            
+                // Send AJAX request to save assignments
+                fetch('/newapp/save_assignments/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),  // Ensure you include CSRF token
+                    },
+                    body: JSON.stringify({
+                        language: selectedLanguage,
+                        assignedImages: assignedImages,
+                    }),
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert('Assignments saved successfully!');
+                        // Optionally, you can update the UI or perform other actions
+                    } else {
+                        alert('Error saving assignments.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+            
+
+// Include this function to get CSRF token from cookies
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+            
+function validateAnnotation(annotator) {
+    // You need to send a request to the backend to mark the annotation as validated
+    // You can use fetch or XMLHttpRequest to send a POST request to your Django view
+    // Make sure you include the necessary CSRF token in the request headers
+
+    // Example:
+    fetch('/newapp/validate_annotation/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),  // Ensure you include CSRF token
+        },
+        body: JSON.stringify({
+            annotator: annotator,
+            // Add any other data you need to identify the annotation
+        }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert('Annotation validated successfully!');
+            // Optionally, you can update the UI or perform other actions
+        } else {
+            alert('Error validating annotation.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+</body>
+</html>

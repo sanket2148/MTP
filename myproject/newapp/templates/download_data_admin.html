@@ -1,0 +1,372 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="newapp/static/images/kannada1.jpeg" itemprop="image">
+    <title>Download Annotations Demo</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #333;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+        }
+        
+        .manage-language-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manage-language-section select, .manage-language-section button {
+            padding: 10px;
+        }
+        
+        /*#image-display-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            border-radius: 10px 10px 0 0;
+            border-color: black;
+                }
+        
+        #image-container img {
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px 10px 0 0;
+            border-color: black;
+        }*/
+        
+        #folder-name-title {
+            margin-top: 20px;
+        }
+        
+        #image-upload-input {
+            display: none;
+        }
+        .folder-button {
+            display: inline-block;
+            text-align: center;
+            margin: 10px; 
+            font-family: Arial, sans-serif; 
+            cursor: pointer;
+        }
+        
+        .folder-icon {
+            width: 70px; 
+            height: 50px; 
+            background-color: #FFD700; 
+            border-radius: 10px 10px 0 0; 
+            position: relative;
+            padding: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .folder-icon img {
+            max-width: 100%; 
+            max-height: 100%; 
+            display: block;
+            margin: auto;
+        }
+        
+        .folder-label {
+            background-color: #FFD700; 
+            padding: 5px 15px;
+            border-radius: 0 0 10px 10px; 
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        a.button {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #555;
+        }
+        
+
+        .languageFolder {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Creates a grid with flexible columns */
+            grid-auto-rows: minmax(100px, auto); /* Sets the minimum height for rows and allows them to grow as needed */
+            gap: 10px; /* Spacing between grid items */
+            padding: 10px; /* Padding inside the gallery */
+            max-height: 80vh; /* Sets a max height based on the viewport height */
+            overflow-y: auto; /* Enables vertical scrolling */
+            flex-direction: column;
+        }
+        
+        .imageContainer {
+            position: relative; /* Needed for absolute positioning of children */
+            /* No need to set width or height here, as it will be controlled by the grid */
+        }
+        
+        .imageContainer img {
+            width: 100%; /* Ensure the image fills the container */
+            height: auto; /* Maintain aspect ratio */
+            display: block; /* Prevent inline spacing issues */
+        }
+        
+        /* Other styles... */
+        
+        .image:hover img {
+            transform: scale(1.15); /* Slight zoom on hover */
+        }
+        .imageCheckbox {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+        }
+        .images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Creates as many columns as possible with a minimum width of 150px */
+            gap: 10px; /* Space between the images */
+            padding: 10px; /* Padding around the grid */
+        }
+        
+        .image {
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Centers the checkbox and image within each .image div */
+        }
+        
+        .image img {
+            width: 100%; /* Image will take up 100% width of the .image div */
+            height: auto; /* Height will be adjusted automatically to maintain aspect ratio */
+            display: block; /* Ensures the image is displayed as a block */
+            margin-bottom: 5px; /* Space between the image and the checkbox below it */
+        }
+        .images {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .image img {
+            width: 100%; /* Adjust width as needed, or set to auto for original image width */
+            display: block;
+            margin-bottom: 5px; /* Space between the image and the checkbox */
+        }
+        
+        .image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+
+
+        
+    </style>
+</head>
+<body>
+<!-- Header content goes here -->
+    <!-- Header content goes here -->
+    <header>
+        <h1>Admin Dashboard - TALKSCRIBE</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li>
+            <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li>
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+<button onclick="displayLanguageFolders()">Download Images</button>
+<button onclick="downloadSelectedAnnotations()">Download Selected</button>
+
+<div id="downloadContainer" style="display: none;">
+    <!-- Hindi Folder -->
+    <h3>Hindi</h3> 
+    <div class="languageFolder">
+        <div class="imageContainer">
+            <input type="checkbox" class="select-all"> Select All
+        </div>  
+        {% for image in user_images %}
+            <div class="image">
+                <input type="checkbox" class="image-checkbox" data-lang="{{ image.language.name }}" data-image="{{ image.title }}">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}" width="200">
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Kannada Folder -->
+    <h3>Kannada</h3>
+    <div class="languageFolder">
+        <div class="imageContainer">
+            <input type="checkbox" class="select-all"> Select All
+        </div>  
+        {% for image in user_images %}
+            <div class="image">
+                <input type="checkbox" class="image-checkbox" data-lang="{{ image.language.name }}" data-image="{{ image.title }}">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}" width="200">
+            </div>
+        {% endfor %}
+    </div>
+    <h3> Bengali</h3>
+    <div class="languageFolder">
+        <div class="imageContainer">
+            <input type="checkbox" class="select-all"> Select All
+        </div>  
+        {% for image in user_images %}
+            <div class="image">
+                <input type="checkbox" class="image-checkbox" data-lang="{{ image.language.name }}" data-image="{{ image.title }}">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}" width="200">
+            </div>
+        {% endfor %}
+    </div>
+    
+
+    <h3>Tamil Image</h3>
+    <div class="languageFolder">
+        <div class="imageContainer">
+            <input type="checkbox" class="select-all"> Select All
+        </div>  
+        {% for image in user_images %}
+            <div class="image">
+                <input type="checkbox" class="image-checkbox" data-lang="{{ image.language.name }}" data-image="{{ image.title }}">
+                <img src="{{ image.image.url }}" alt="{{ image.title }}" width="200">
+            </div>
+        {% endfor %}
+    </div>
+</div>
+    
+</main>
+<script>
+function displayLanguageFolders() {
+    document.getElementById('downloadContainer').style.display = 'block';
+}
+
+document.querySelectorAll('.select-all').forEach(selectAllCheckbox => {
+    selectAllCheckbox.addEventListener('change', function() {
+        let languageFolder = this.closest('.languageFolder');
+        let imageCheckboxes = languageFolder.querySelectorAll('.image-checkbox');
+        imageCheckboxes.forEach(chk => {
+            chk.checked = this.checked;
+        });
+    });
+});
+
+function downloadSelectedAnnotations() {
+    let selectedImages = [];
+    let checkboxes = document.querySelectorAll('.image-checkbox:checked');
+    checkboxes.forEach(chk => {
+        selectedImages.push({ lang: chk.dataset.lang, image: chk.dataset.image });
+    });
+
+    if (selectedImages.length === 0) {
+        alert('No images selected!');
+        return;
+    }
+
+    let zip = new JSZip();
+    for (let selected of selectedImages) {
+        zip.file(`${selected.lang}/${selected.image}.txt`, "Sample annotation for " + selected.image);
+    }
+
+    zip.generateAsync({ type: "blob" })
+        .then(function(blob) {
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "annotations.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+}
+</script>
+
+</body>
+</html>

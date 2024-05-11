@@ -1,0 +1,857 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Annotation Software</title>
+    <script src="{% static 'js/start_annotation_annotator.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        h1{
+            color: #ffffff;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: flex; 
+            gap: 20px;
+        }
+        
+        .preview {
+            border: 2px dashed #aaa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 400px; /* Set a max height for the preview area */
+            
+        }
+        
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #333;
+        }
+        
+        .btn-danger {
+            background-color: green;
+        }
+        
+        .btn-danger:hover {
+            background-color: darkred;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .image-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #333;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        
+        .manage-language-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manage-language-section select, .manage-language-section button {
+            padding: 10px;
+        }
+        
+        #image-display-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        #image-container img {
+            max-width: 150px;
+            height: auto;
+            
+    max-height: none;
+        }
+        
+        #folder-name-title {
+            margin-top: 20px;
+        }
+        
+        #image-upload-input {
+            display: none;
+        }
+        
+        .imgContainer {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255,255,255,0.8);
+            color: black;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid black;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+        
+        #focused-image img {
+            width: 100%;
+            height: auto;
+            max-height: 400px; /* Set a max-height for the focused image */
+            border: 2px solid #333; /* Highlight the focused image */
+        }
+
+        #image-list img {
+            width: 100px; /* Set a fixed width for thumbnails */
+            height: auto;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            position: relative;
+        }
+
+        
+    
+        /* Add styles for the image gallery */
+        #image-gallery {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            height: 100vh;/* Make the gallery take up the remaining space */
+        }
+        
+
+        #image-list {
+            display: flex;
+            overflow-x: auto; /* Allow horizontal scrolling for the thumbnail list */
+            margin-top: 10px;
+            gap: 10px; /* Add some space between thumbnails */
+            max-height: 150px; /* Set a max height for the image list */
+            overflow-y: auto; /* Enable vertical scrolling */
+            white-space: nowrap;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+
+        .image-list img::before {
+            content: "✖";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 20px;
+            color: red;
+            background-color: white;
+            border: 1px solid red;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+        }
+        /* Apply this CSS to the thumbnail images in the list */
+        .thumbnail-container img {
+            width: 100px; /* Adjust the width as needed */
+            height: 100px; /* Adjust the height as needed */
+            object-fit: cover; /* Ensures the image covers the container */
+            margin: 5px; /* Add margin for spacing between images */
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /* Gallery Container */
+    .gallery-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* Thumbnail Styling */
+    .thumbnail-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+    }
+
+    .thumbnail-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .thumbnail-container:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Delete Button Styling */
+    .delete-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    /* Modal View */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 2;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 600px) {
+        .thumbnail-container {
+            width: 100px;
+            height: 100px;
+        }
+    }
+    #searchBar {
+        width: 10%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #image-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive columns */
+        gap: 10px;
+        padding: 10px;
+        margin: auto;
+        max-width: 90%; /* Adjust as per your layout needs */
+        height: auto; /* Adjust to 'auto' if you want the container to grow with content */
+        max-height: none;
+    }
+
+    .imgContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .imgContainer img {
+        width: 100%; /* Maintain full width within each container */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .imgLabel {
+        white-space: nowrap; /* Keeps text in a single line */
+        overflow: hidden; /* Hides text that goes beyond the bounds */
+        text-overflow: ellipsis; /* Adds '...' at the end of the text if it's too long */
+        width: 100px; /* Set a fixed width; adjust as necessary */
+        text-align: center; /* Centers the text */
+    }
+
+    .delete-button {
+        margin-top: 5px;
+    }
+
+    .container {
+        width: 90%;
+        height: 80%;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+    }
+    .left-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .preview {
+        height: 50%;
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .text-box {
+        height: 30%;
+        border: 1px solid #000;
+    }
+    .buttons {
+        height: 20%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .button {
+        padding: 10px 20px;
+        border: 1px solid #000;
+        cursor: pointer;
+    }
+    .right-section {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        overflow-y: auto;
+    }
+    .image-tile {
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .annotation-tag {
+    padding: 2px 5px;
+    position: absolute;
+    top: 5px; /* Adjust as needed */
+    right: 5px; /* Adjust as needed */
+    font-size: 0.8em;
+}
+
+.annotated .annotation-tag {
+    background-color: green;
+    color: white;
+}
+
+.not-annotated-tag {
+    background-color: red;
+    color: white;
+}
+
+
+</style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+    main {
+        margin-left: 260px;
+        padding: 20px;
+    }
+
+    h2 {
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid #333;
+    }
+
+    th {
+        background-color: #555;
+        color: #fff;
+        padding: 10px;
+    }
+
+    td {
+        padding: 10px;
+    }
+
+    .manage-language-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .manage-language-section select, .manage-language-section button {
+        padding: 10px;
+    }
+
+    #image-display-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    #image-container img {
+        max-width: 150px;
+        height: auto;
+    }
+
+    #folder-name-title {
+        margin-top: 20px;
+    }
+
+    #image-upload-input {
+        display: none;
+    }
+    .folder-button {
+        display: inline-block;
+        text-align: center;
+        margin: 10px; 
+        font-family: Arial, sans-serif; 
+        cursor: pointer;
+    }
+
+    .folder-icon {
+        width: 70px; 
+        height: 50px; 
+        background-color: #FFD700; 
+        border-radius: 10px 10px 0 0; 
+        position: relative;
+        padding: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .folder-icon img {
+        max-width: 100%; 
+        max-height: 100%; 
+        display: block;
+        margin: auto;
+    }
+
+    .folder-label {
+        background-color: #FFD700; 
+        padding: 5px 15px;
+        border-radius: 0 0 10px 10px; 
+        font-size: 14px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    #language-list {
+        display: flex;
+        flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+        justify-content: flex-start; /* This aligns items to the start of the container */
+        gap: 10px; /* This adds a gap between the items */
+    }
+    #language-list li {
+        flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+    }
+
+    a.button {
+        display: block;
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    a.button:hover {
+        background-color: #555;
+    }
+
+
+    #gallery-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    }
+
+    .gallery-image {
+    width: 100%;
+    object-fit: cover;
+    }
+    #image-gallery div {
+        /* Style each image wrapper */
+        border: 1px solid #ddd;
+        padding: 5px;
+        border-radius: 5px;
+    }
+    /* Add styles for the active image */
+.active-img {
+    border: 2px solid blue; /* Example border style */
+    box-shadow: 0px 0px 5px 2px rgba(0, 0, 255, 0.5); /* Example box shadow */
+}
+
+</style>
+{% csrf_token %}
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Annotator Dashboard - TALKSCRIBE</h>
+    </header>
+    <nav>
+        <ul>            
+            <li><a class="button" href="{% url 'annotator' %}">Home</a></li>
+            <li><a class="button" href="{% url 'check_annotation_annotator' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation_annotator' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_annotator' %}">Download Data</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings_annotator' %}">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+    
+    
+        
+    
+       
+
+
+      <!-- ... your existing container content before the grid ... -->
+    
+        
+    
+        <div class="grid">
+            <div>
+                <!-- <h2>Upload Images</h2>
+                <input type="file" id="imageUpload" accept="image/*" multiple> -->
+                <div class="language-selection-section">
+                    <label for="imagelanguageSelect">Select Language:</label>
+                    <select id="imagelanguageSelect">
+                        <!-- Dynamically populate this with languages using Django -->
+                        <!-- {% for language in languages %}
+                        <option value="{{ language.name }}">{{ language.name }}</option>
+                        {% endfor %} -->
+                        <option value="">--Select a language--</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Kannada">Kannada</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Gujarati">Gujarati</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Punjabi">Punjabi</option>
+                        <option value="Odia">Odia</option>
+                        <option value="Assamese">Assamese</option>
+                    </select>
+                </div>
+                
+                {% comment %} <button id="assignedimages" onclick="">AssignedImages</button> {% endcomment %}
+                <!-- <div class="upload-from-language-folder-section">
+                    <button id="uploadFromLanguageFolder" onclick="displayFetchedImages()">Upload Images From Selected Language Folder</button>
+                </div> -->
+                <!-- Search Bar -->
+                    <input type="text" id="searchBar" onkeyup="searchImages()" placeholder="Search for images...">
+                    <div >
+                        <h2>Preview</h2>
+                        <div class="preview" id="focused-image">
+                        <!-- Focused Image will appear here -->
+                    </div>
+                     
+                    <div class="image-actions">
+                            <button onclick="showPreviousImage()">Previous Image</button>
+                            <button onclick="showNextImage()">Next Image</button>
+                            {% comment %} <button onclick="undoDeletedImage()">Undo Deleted Image</button> {% endcomment %}
+                            <button onclick="downloadImagesAsZip()">Download Images as ZIP</button>
+                    </div>
+                        <!-- ... your existing container content after the grid ... -->
+                    
+                    
+            </div> 
+        <div>
+                <h2>Text Input</h2>
+                <textarea id="voiceTextInput" rows="10" placeholder="Enter or paste text here..."></textarea>
+                <select id="languageSelect">
+                    <option value="en-IN">English (India)</option>
+                    <option value="hi-IN">Hindi (India)</option>
+                    <option value="bn-IN">Bengali (India)</option>
+                    <option value="te-IN">Telugu (India)</option>
+                    <option value="mr-IN">Marathi (India)</option>
+                    <option value="ta-IN">Tamil (India)</option>
+                    <option value="kn-IN">Kannada (India)</option>
+                    <option value="gu-IN">Gujarati (India)</option>
+                    <option value="ml-IN">Malayalam (India)</option>
+                    <option value="pa-IN">Punjabi (India)</option>
+                    <option value="or-IN">Odia (India)</option>
+                    <option value="asm-IN">Assamese (India)</option>
+                </select>
+                
+                <div class="actions">
+                    <button onclick="startDictation()">Start</button>
+                    <button onclick="stopDictation()" style=background-color:red>Stop</button>
+                    <button onclick="addEntryToTable()" style=background-color:green>submit Annotation</button>
+                </div>
+                
+            </div>
+        </div>
+            
+    
+        <div id="image-gallery">
+            <div id="image-list-container">
+                <!--<div id="image-list">
+                 List of images will appear here 
+                
+                </div>-->
+                <div id="fetched-images">
+                    <!-- Fetched image gallery will be displayed here -->
+                </div>
+            </div>
+            
+        </div>
+        
+        
+       
+</div>
+            
+        
+    
+    
+   
+    
+    </main>
+    <main><h2>Annotations</h2>
+    <table id="annotationsTable">
+        <thead>
+        <tr>
+            
+            <th>Image</th>
+            <th>Text</th>
+            <th>Actions</th>
+            <th>created_at</th>
+        </tr>
+        </thead>
+        <tbody>
+            <!-- {% for annotation in annotations %}
+            <tr>
+                <td>{{ annotation.image.title }}</td>
+                <td>{{ annotation.text }}</td>
+                <td>
+                     Edit button 
+                    <button onclick="editAnnotation({{ annotation.text }})">Edit</button>
+                    Delete button 
+                    <button onclick="deleteAnnotation({{ annotation.text  }}, this)">Delete</button>
+                </td>
+            </tr>
+            {% endfor %} -->
+        </tbody>
+    </table>
+    <button class="btn-danger" onclick="undoDelete()">Undo Deletion</button>
+    <button onclick="downloadAnnotations()">Download Annotations</button>
+    </div>
+    </main>
+    </main>
+    
+</body>    
+
+
+
+
+</html>
+<!-- function submitAnnotation(imageId, annotationText, languageName) {
+    const data = new FormData();
+    data.append('image_id', imageId);
+    data.append('annotation', annotationText);
+    data.append('language', languageName);
+
+    fetch('/newapp/create_annotation/', {
+        method: 'POST',
+        body: data,
+        credentials: 'include',  // To ensure cookies, such as CSRF tokens, are sent
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(data.success);
+            // Optionally, update the UI to reflect the newly saved annotation
+        } else if (data.error) {
+            console.error(data.error);
+        }
+    })
+    .catch(error => console.error('Error saving annotation:', error));
+} -->

@@ -1,0 +1,606 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/setting.js' %}"></script>
+    <title>Settings - TALKSCRIBE</title>
+    <style>
+        /* ... Previous Styles ... */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #333;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+        }
+        
+        .manage-language-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manage-language-section select, .manage-language-section button {
+            padding: 10px;
+        }
+        
+        #image-display-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        #image-container img {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        #folder-name-title {
+            margin-top: 20px;
+        }
+        
+        #image-upload-input {
+            display: none;
+        }
+        .folder-button {
+            display: inline-block;
+            text-align: center;
+            margin: 10px; 
+            font-family: Arial, sans-serif; 
+            cursor: pointer;
+        }
+        
+        .folder-icon {
+            width: 70px; 
+            height: 50px; 
+            background-color: #FFD700; 
+            border-radius: 10px 10px 0 0; 
+            position: relative;
+            padding: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .folder-icon img {
+            max-width: 100%; 
+            max-height: 100%; 
+            display: block;
+            margin: auto;
+        }
+        
+        .folder-label {
+            background-color: #FFD700; 
+            padding: 5px 15px;
+            border-radius: 0 0 10px 10px; 
+            font-size: 14px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        #language-list {
+            display: flex;
+            flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+            justify-content: flex-start; /* This aligns items to the start of the container */
+            gap: 10px; /* This adds a gap between the items */
+        }
+        #language-list li {
+            flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        a.button {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #555;
+        }
+        
+        
+        #gallery-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+          gap: 10px;
+        }
+        
+        .gallery-image {
+          width: 100%;
+          object-fit: cover;
+        }
+        #image-gallery div {
+            /* Style each image wrapper */
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        
+    </style>
+    <style>
+        /* Add basic styling for the modal, adjust as needed */
+        .modal {
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+    
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+    
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+    
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Feedback Form Styling */
+        .feedback-question {
+            margin-bottom: 20px;
+        }
+        
+        .feedback-question label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .feedback-question input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Ensures the padding does not increase the element's size */
+        }
+        
+        .feedback-question textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            height: 100px; /* Sets a minimum height for the textarea */
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        
+        button[type="submit"] {
+            background-color: #4CAF50; /* Green background */
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #45a049; /* Darker shade of green */
+        }
+        
+        /* Enhancements for admin-specific and admin-validator-specific questions */
+        .admin-specific, .admin-validator-specific {
+            padding: 15px;
+            background-color: #f0f0f0; /* Light grey background */
+            border-left: 4px solid #4CAF50; /* Green border on the left */
+            margin-bottom: 20px;
+        }
+        
+        /* Container and Form Styling */
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        form#user-feedback-form {
+            max-width: 800px;
+            margin: auto;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+    </style>
+    <body>
+        <!-- Header content goes here -->
+        <!-- Header content goes here -->
+            <header>
+                <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Researcher Dashboard - TALKSCRIBE</h1>
+            </header>
+        
+            <nav>
+                <ul>            
+                    <li><a class="button" href="{% url 'researcher'%}">Home</a></li>
+                    <li><a class="button" href="{% url 'check_annotation_researcher'%}">Check Annotation</a></li>
+                    {% comment %} <li><a class="button" href="{% url 'download_data_researcher'%}">Download Data</a></li> {% endcomment %}
+                    <li><a class="button" href="{% url 'settings_researcher'%}">Settings</a></li>
+                </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+        <h2><strong>Settings</strong></h2>
+        <!-- <section>
+            <h2>Change Preferred Language</h2>
+            <form id="language-preference-form">
+                {% for language in languages %}
+                <div class="language-option">
+                    <input type="checkbox" id="lang{{ language.id }}" name="languages" value="{{ language.id }}" {% if language in user.userprofile.languages.all %} checked {% endif %}>
+                    <label for="lang{{ language.id }}">{{ language.name }}</label>
+                </div>
+                {% endfor %}
+                <button type="button" onclick="changePreferredLanguage()">Update Preferences</button>
+            </form>
+        </section> 
+        <section>
+            <h2>Theme</h2>
+            <div class="settings-item">
+                <label for="dark-mode-toggle">Dark Mode:</label>
+                <input type="checkbox" id="dark-mode-toggle">
+            </div>
+        </section>-->
+
+        
+
+        
+        <section>
+            <h3>User Feedback</h3>
+            <form id="user-feedback-form">
+                <div class="feedback-question">
+                    <label for="ui-rating">How would you rate the user interface?</label>
+                    <input type="number" id="ui-rating" name="ui-rating" min="1" max="5" required>
+                    <textarea id="ui-feedback" name="ui-feedback" placeholder="Please explain your rating..." required></textarea>
+                </div>
+                
+                <!-- This question is specifically for admins -->
+                <div class="feedback-question admin-specific" style="display: none;">
+                    <label for="image-upload-rating">How would you rate the image upload and assigning tasks for annotation?</label>
+                    <input type="number" id="image-upload-rating" name="image-upload-rating" min="1" max="5" required>
+                    <textarea id="image-upload-feedback" name="image-upload-feedback" placeholder="Please explain your rating..." required></textarea>
+                </div>
+        
+                <div class="feedback-question">
+                    <label for="annotation-process-rating">How do you rate the annotation process?</label>
+                    <input type="number" id="annotation-process-rating" name="annotation-process-rating" min="1" max="5" required>
+                    <textarea id="annotation-process-feedback" name="annotation-process-feedback" placeholder="Please explain your rating..." required></textarea>
+                </div>
+        
+                <!-- This question is for admins and validators only -->
+                <div class="feedback-question admin-validator-specific" style="display: none;">
+                    <label for="validation-process-rating">How do you rate the validation process for annotations?</label>
+                    <input type="number" id="validation-process-rating" name="validation-process-rating" min="1" max="5" required>
+                    <textarea id="validation-process-feedback" name="validation-process-feedback" placeholder="Please explain your rating..." required></textarea>
+                </div>
+        
+                <div class="feedback-question">
+                    <label for="overall-software-rating">How would you rate the overall software?</label>
+                    <input type="number" id="overall-software-rating" name="overall-software-rating" min="1" max="5" required>
+                    <textarea id="overall-feedback" name="overall-feedback" placeholder="If you have any specific feedback, please share it with us to help us improve..." required></textarea>
+                </div>
+                
+                <button type="submit">Submit Feedback</button>
+            </form>
+        </section>
+        <section>
+            <h2>Support</h2>
+            <div class="settings-item">
+                {% comment %} <button onclick="window.location.href='help.html'">Help</button> {% endcomment %}
+                <button><a href="{% url 'help' %}">Help</a></button>
+            </div>
+        </section>
+        <section>
+            <h2>Security</h2>
+            <div class="settings-item">
+                {% comment %} <button onclick="window.location.href='change_password.html'">Change Password</button> {% endcomment %}
+                <button><a href="{% url 'change_password_researcher' %}">Change Password</a></button>
+
+            </div>
+        </section>
+        <section>
+            <h2>Account</h2>
+            <div class="settings-item">
+                <button><a href="{% url 'logout' %}">Logout</a></button>
+            </div>
+        </section>
+        <section>
+            <h2>Delete Account</h2>
+            <div class="settings-item">
+                <button id="delete-account-btn" Style="background-color:red ">Delete Account</button>
+            </div>
+        </section>
+        
+        <!-- Inside your modal for confirmation -->
+        <div id="delete-account-modal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                <p>Please type "<strong>DELETE MY ACCOUNT</strong>" to confirm:</p>
+                <input type="text" id="confirm-delete-input">
+                <!-- Generate OTP Button -->
+                <button id="generate-otp-btn" style="display:none;">Generate OTP</button>
+                <p>Enter OTP sent to your email:</p>
+                <input type="text" id="otp-input" style="display:none;">
+                <button id="confirm-delete-btn">Confirm</button>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        var deleteAccountBtn = document.getElementById("delete-account-btn");
+        var confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+        var generateOtpBtn = document.getElementById("generate-otp-btn");
+        var closeModalBtn = document.querySelector(".close");
+        var modal = document.getElementById("delete-account-modal");
+        var confirmationInput = document.getElementById("confirm-delete-input");
+        var otpInput = document.getElementById("otp-input");
+    
+        closeModalBtn.onclick = function() {
+            modal.style.display = "none";
+        };
+    
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    
+        function hideModal() {
+            if (modal) modal.style.display = "none";
+        }
+    
+        deleteAccountBtn.onclick = function() {
+            if (modal) modal.style.display = "block";
+        };
+    
+        closeModalBtn.onclick = function() {
+            hideModal();
+        };
+    
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                hideModal();
+            }
+        };
+    
+        confirmationInput.onkeyup = function() {
+            if (confirmationInput.value.trim() === "DELETE MY ACCOUNT") {
+                generateOtpBtn.style.display = "block";
+            } else {
+                generateOtpBtn.style.display = "none";
+            }
+        };
+    
+        generateOtpBtn.onclick = function() {
+            fetch('/newapp/delete_account/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: 'request_otp=true'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.success) {
+                    alert("OTP has been sent to your email.");
+                    otpInput.style.display = "block";
+                    otpInput.focus();
+                } else {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the OTP request:', error);
+            });
+        };
+    
+        confirmDeleteBtn.onclick = function() {
+            if (confirmationInput.value.trim() === "DELETE MY ACCOUNT" && otpInput.value.trim()) {
+                fetch('/newapp/delete_account/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: `confirmation_phrase=DELETE MY ACCOUNT&otp=${otpInput.value.trim()}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        window.location.href = "/newapp/create_account/";
+                    } else {
+                        alert(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+            } else {
+                alert("Please type 'DELETE MY ACCOUNT' and enter the OTP.");
+            }
+        };
+    });
+    
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Example of setting user role, adjust based on your application's logic
+        const userRole = "admin"; // This could be dynamically set based on the logged-in user's role
+    
+        // Show/hide role-specific questions based on the user role
+        if (userRole === "admin" || userRole === "validator") {
+            document.querySelectorAll(".admin-specific").forEach(el => el.style.display = "block");
+        }
+        if (userRole === "admin" || userRole === "validator") {
+            document.querySelectorAll(".admin-validator-specific").forEach(el => el.style.display = "block");
+        }
+    
+        // Handle form submission
+        const feedbackForm = document.getElementById("user-feedback-form");
+        feedbackForm.addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+            
+            // Collect form data
+            const formData = new FormData(feedbackForm);
+            
+            // Example of sending the form data to the server using fetch
+            fetch('/newapp/submit_feedback/', {
+                method: 'POST',
+                body: formData,
+                credentials: 'include', // Include cookies
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'), // Ensure CSRF token is included if needed
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle success
+            })
+            .catch(error => {
+                console.error('Error:', error); // Handle errors
+            });
+        });
+    });
+    
+    // Utility function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    </script>
+</body>
+
+</html>

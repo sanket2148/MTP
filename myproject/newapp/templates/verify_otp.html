@@ -1,0 +1,105 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="{% static 'js/verify_otp.js' %}"></script>
+    <title>Verify OTP</title>
+    <!-- Add any additional CSS or meta tags as needed -->
+</head>
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    
+    header {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+    }
+    
+    .container {
+        width: 300px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border: 1px solid #e1e1e1;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .container h1 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    
+    input[type="text"], input[type="password"], select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #e1e1e1;
+    }
+    
+    button[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+    }
+    
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    
+    .options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .options a {
+        text-decoration: none;
+        color: #4CAF50;
+    }
+    
+    .options a:hover {
+        text-decoration: underline;
+    }
+    
+</style>
+<body>
+    <div class="container">
+        <h2>OTP Verification</h2>
+        <p>Please enter the OTP sent to your email.</p>
+
+        <!-- In verify_otp.html -->
+        <form method="post" action="{% url 'verify_otp' %}">
+            {% csrf_token %}
+            <label for="otp">OTP:</label>
+            <input type="text" id="otp" name="otp" required>
+            <button type="submit">Verify</button>
+            <button id="resendOTP" onclick="resendOTP()">Resend OTP</button>
+            <span id="timer"></span>    
+        </form>
+
+
+        {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+
+</body>
+</html>

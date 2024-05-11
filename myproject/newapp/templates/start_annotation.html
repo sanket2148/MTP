@@ -1,0 +1,2653 @@
+{%load static  %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <meta charset="UTF-8">
+    <!-- <script src="{% static 'js/start_annotation_annotator.js' %}"></script> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Annotation Software</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        h1{
+            color: #ffffff;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: flex; 
+            gap: 20px;
+        }
+        
+        .preview {
+            border: 2px dashed #aaa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 400px; /* Set a max height for the preview area */
+            
+        }
+        
+        .preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #333;
+        }
+        
+        .btn-danger {
+            background-color: green;
+        }
+        
+        .btn-danger:hover {
+            background-color: darkred;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .image-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #333;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            resize: vertical;
+        }
+        
+        .manage-language-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manage-language-section select, .manage-language-section button {
+            padding: 10px;
+        }
+        
+        #image-display-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        #image-container img {
+            max-width: 150px;
+            height: auto;
+            
+    max-height: none;
+        }
+        
+        #folder-name-title {
+            margin-top: 20px;
+        }
+        
+        #image-upload-input {
+            display: none;
+        }
+        
+        .imgContainer {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .remove-image {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(255,255,255,0.8);
+            color: black;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid black;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.5);
+            font-weight: bold;
+        }
+        
+        #focused-image img {
+            width: 100%;
+            height: auto;
+            max-height: 400px; /* Set a max-height for the focused image */
+            border: 2px solid #333; /* Highlight the focused image */
+        }
+
+        #image-list img {
+            width: 100px; /* Set a fixed width for thumbnails */
+            height: auto;
+            opacity: 0.6;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            position: relative;
+        }
+
+        
+    
+        /* Add styles for the image gallery */
+        #image-gallery {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            height: 100vh;/* Make the gallery take up the remaining space */
+        }
+        
+
+        #image-list {
+            display: flex;
+            overflow-x: auto; /* Allow horizontal scrolling for the thumbnail list */
+            margin-top: 10px;
+            gap: 10px; /* Add some space between thumbnails */
+            max-height: 150px; /* Set a max height for the image list */
+            overflow-y: auto; /* Enable vertical scrolling */
+            white-space: nowrap;
+            overflow-x: auto; /* Enable horizontal scrolling */
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+
+        .image-list img::before {
+            content: "✖";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 20px;
+            color: red;
+            background-color: white;
+            border: 1px solid red;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            cursor: pointer;
+        }
+        /* Apply this CSS to the thumbnail images in the list */
+        .thumbnail-container img {
+            width: 100px; /* Adjust the width as needed */
+            height: 100px; /* Adjust the height as needed */
+            object-fit: cover; /* Ensures the image covers the container */
+            margin: 5px; /* Add margin for spacing between images */
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /* Gallery Container */
+    .gallery-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    /* Thumbnail Styling */
+    .thumbnail-container {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+    }
+
+    .thumbnail-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .thumbnail-container:hover img {
+        transform: scale(1.1);
+    }
+
+    /* Delete Button Styling */
+    .delete-button {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background-color: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    /* Modal View */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 2;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+        width: 80%;
+        max-width: 700px;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 600px) {
+        .thumbnail-container {
+            width: 100px;
+            height: 100px;
+        }
+    }
+    #searchBar {
+        width: 10%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #image-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Responsive columns */
+        gap: 10px;
+        padding: 10px;
+        margin: auto;
+        max-width: 90%; /* Adjust as per your layout needs */
+        height: auto; /* Adjust to 'auto' if you want the container to grow with content */
+        max-height: none;
+    }
+
+    .imgContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .imgContainer img {
+        width: 100%; /* Maintain full width within each container */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+    .imgLabel {
+        white-space: nowrap; /* Keeps text in a single line */
+        overflow: hidden; /* Hides text that goes beyond the bounds */
+        text-overflow: ellipsis; /* Adds '...' at the end of the text if it's too long */
+        width: 100px; /* Set a fixed width; adjust as necessary */
+        text-align: center; /* Centers the text */
+    }
+
+    .delete-button {
+        margin-top: 5px;
+    }
+
+    .container {
+        width: 90%;
+        height: 80%;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 20px;
+    }
+    .left-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .preview {
+        height: 50%;
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .text-box {
+        height: 30%;
+        border: 1px solid #000;
+    }
+    .buttons {
+        height: 20%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .button {
+        padding: 10px 20px;
+        border: 1px solid #000;
+        cursor: pointer;
+    }
+    .right-section {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        overflow-y: auto;
+    }
+    .image-tile {
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+main {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #333;
+}
+
+th {
+    background-color: #555;
+    color: #fff;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+}
+
+.manage-language-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.manage-language-section select, .manage-language-section button {
+    padding: 10px;
+}
+
+#image-display-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#image-container img {
+    max-width: 150px;
+    height: auto;
+}
+
+#folder-name-title {
+    margin-top: 20px;
+}
+
+#image-upload-input {
+    display: none;
+}
+.folder-button {
+    display: inline-block;
+    text-align: center;
+    margin: 10px; 
+    font-family: Arial, sans-serif; 
+    cursor: pointer;
+}
+
+.folder-icon {
+    width: 70px; 
+    height: 50px; 
+    background-color: #FFD700; 
+    border-radius: 10px 10px 0 0; 
+    position: relative;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon img {
+    max-width: 100%; 
+    max-height: 100%; 
+    display: block;
+    margin: auto;
+}
+
+.folder-label {
+    background-color: #FFD700; 
+    padding: 5px 15px;
+    border-radius: 0 0 10px 10px; 
+    font-size: 14px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+#language-list {
+    display: flex;
+    flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+    justify-content: flex-start; /* This aligns items to the start of the container */
+    gap: 10px; /* This adds a gap between the items */
+}
+#language-list li {
+    flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+}
+
+a.button {
+    display: block;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+a.button:hover {
+    background-color: #555;
+}
+
+
+#gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.gallery-image {
+  width: 100%;
+  object-fit: cover;
+}
+#image-gallery div {
+    /* Style each image wrapper */
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+</style>
+<style>
+    .language-keyboard {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.language-keyboard button {
+    width: 5%; /* Set each button to occupy 10% of the container width */
+    margin: 0.5%; /* Add some margin between buttons */
+}
+
+</style>
+{% csrf_token %}
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Admin Dashboard</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            {% comment %} <li><a class="button" href="{% url 'admin_annotation_validation' %}">Validation</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+    
+    
+        
+    
+       
+
+
+      <!-- ... your existing container content before the grid ... -->
+    
+        
+    
+        <div class="grid">
+            <div>
+                <!-- <h2>Upload Images</h2>
+                <input type="file" id="imageUpload" accept="image/*" multiple> -->
+                <div class="language-selection-section">
+                    <label for="imagelanguageSelect">Select Language:</label>
+                    <select id="imagelanguageSelect">
+                        <!-- Dynamically populate this with languages using Django -->
+                        <!-- {% for language in languages %}
+                        <option value="{{ language.name }}">{{ language.name }}</option>
+                        {% endfor %} -->
+                        <option value="">--Select a language--</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Kannada">Kannada</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Gujarati">Gujarati</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Punjabi">Punjabi</option>
+                        <option value="Odia">Odia</option>
+                        <option value="Assamese">Assamese</option>
+                    </select>
+                </div>
+                
+                <!-- <div class="upload-from-language-folder-section">
+                    <button id="uploadFromLanguageFolder" onclick="displayFetchedImages()">Upload Images From Selected Language Folder</button>
+                </div> -->
+                <!-- Search Bar -->
+                    <input type="text" id="searchBar" onkeyup="searchImages()" placeholder="Search for images...">
+                    <div >
+                        <h2>Preview</h2>
+                        <div class="preview" id="focused-image">
+                        
+                        <!-- Focused Image will appear here -->
+                    </div>
+                     
+                    <div class="image-actions">
+                            <button onclick="showPreviousImage()">Previous Image</button>
+                            <button onclick="showNextImage()">Next Image</button>
+                            <!-- <button onclick="undoDeletedImage()">Undo Deleted Image</button> -->
+                            <!-- <button onclick="downloadImagesAsZip()">Download Images as ZIP</button> -->
+                    </div>
+                        <!-- ... your existing container content after the grid ... -->
+                    
+                    
+            </div> 
+        <div>
+                <h2>Text Input</h2>
+                <textarea id="voiceTextInput" rows="10" placeholder="Enter or paste text here..."></textarea>
+                <select id="languageSelect">
+                    <option value="en-IN">English (India)</option>
+                    <option value="hi-IN">Hindi (India)</option>
+                    <option value="bn-IN">Bengali (India)</option>
+                    <option value="te-IN">Telugu (India)</option>
+                    <option value="mr-IN">Marathi (India)</option>
+                    <option value="ta-IN">Tamil (India)</option>
+                    <option value="kn-IN">Kannada (India)</option>
+                    <option value="gu-IN">Gujarati (India)</option>
+                    <option value="ml-IN">Malayalam (India)</option>
+                    <option value="pa-IN">Punjabi (India)</option>
+                    <option value="or-IN">Odia (India)</option>
+                    <option value="asm-IN">Assamese (India)</option>
+                </select>
+                
+                <div class="actions">
+                    <button onclick="startDictation()">Start</button>
+                    <button onclick="stopDictation()" style=background-color:red>Stop</button>
+                    <button onclick="addEntryToTable()" style=background-color:green>Submit Annotation</button>
+                </div>
+                <button onclick="openVirtualKeyboard()">Open Virtual Keyboard</button>
+
+                
+                
+                <!-- Virtual keyboard interface -->
+                <div id="virtualKeyboard" style="display: block;">
+                    <!-- Add keys for multiple languages -->
+                    <!-- You can customize the layout and keys based on your requirements -->
+                    <!-- Example: English and Hindi keys -->
+                    <!-- English Keyboard -->
+                    <div class="language-keyboard" id="englishKeyboard" style="display: none;">
+                        <button class="key">Q</button>
+                        <button class="key">W</button>
+                        <button class="key">E</button>
+                        <button class="key">R</button>
+                        <button class="key">T</button>
+                        <button class="key">Y</button>
+                        <button class="key">U</button>
+                        <button class="key">I</button>
+                        <button class="key">O</button>
+                        <button class="key">P</button>
+                        <button class="key">A</button>
+                        <button class="key">S</button>
+                        <button class="key">D</button>
+                        <button class="key">F</button>
+                        <button class="key">G</button>
+                        <button class="key">H</button>
+                        <button class="key">J</button>
+                        <button class="key">K</button>
+                        <button class="key">L</button>
+                        <button class="key">Z</button>
+                        <button class="key">X</button>
+                        <button class="key">C</button>
+                        <button class="key">V</button>
+                        <button class="key">B</button>
+                        <button class="key">N</button>
+                        <button class="key">M</button>
+                        <!-- Add more keys... -->
+                    </div>
+
+                    <!-- Hindi Keyboard -->
+                    <div class="language-keyboard" id="hindiKeyboard" style="display: none;">
+                        <button class="key">अ</button>
+                        <button class="key">आ</button>
+                        <button class="key">इ</button>
+                        <button class="key">ई</button>
+                        <button class="key">उ</button>
+                        <button class="key">ऊ</button>
+                        <button class="key">ऋ</button>
+                        <button class="key">ए</button>
+                        <button class="key">ऐ</button>
+                        <button class="key">ओ</button>
+                        <button class="key">औ</button>
+                        <button class="key">क</button>
+                        <button class="key">ख</button>
+                        <button class="key">ग</button>
+                        <button class="key">घ</button>
+                        <button class="key">ङ</button>
+                        <button class="key">च</button>
+                        <button class="key">छ</button>
+                        <button class="key">ज</button>
+                        <button class="key">झ</button>
+                        <button class="key">ञ</button>
+                        <button class="key">ट</button>
+                        <button class="key">ठ</button>
+                        <button class="key">ड</button>
+                        <button class="key">ढ</button>
+                        <button class="key">ण</button>
+                        <button class="key">त</button>
+                        <button class="key">थ</button>
+                        <button class="key">द</button>
+                        <button class="key">ध</button>
+                        <button class="key">न</button>
+                        <button class="key">प</button>
+                        <button class="key">फ</button>
+                        <button class="key">ब</button>
+                        <button class="key">भ</button>
+                        <button class="key">म</button>
+                        <button class="key">य</button>
+                        <button class="key">र</button>
+                        <button class="key">ल</button>
+                        <button class="key">व</button>
+                        <button class="key">श</button>
+                        <button class="key">ष</button>
+                        <button class="key">स</button>
+                        <button class="key">ह</button>
+                        <button class="key">क्ष</button>
+                        <button class="key">त्र</button>
+                        <button class="key">ज्ञ</button>
+                    </div>
+
+
+                    <!-- Bengali Keyboard -->
+                    <div class="language-keyboard" id="bengaliKeyboard" style="display: none;">
+                        <button class="key">অ</button>
+                        <button class="key">আ</button>
+                        <button class="key">ই</button>
+                        <button class="key">ঈ</button>
+                        <button class="key">উ</button>
+                        <button class="key">ঊ</button>
+                        <button class="key">ঋ</button>
+                        <button class="key">এ</button>
+                        <button class="key">ঐ</button>
+                        <button class="key">ও</button>
+                        <button class="key">ঔ</button>
+                        <button class="key">ক</button>
+                        <button class="key">খ</button>
+                        <button class="key">গ</button>
+                        <button class="key">ঘ</button>
+                        <button class="key">ঙ</button>
+                        <button class="key">চ</button>
+                        <button class="key">ছ</button>
+                        <button class="key">জ</button>
+                        <button class="key">ঝ</button>
+                        <button class="key">ঞ</button>
+                        <button class="key">ট</button>
+                        <button class="key">ঠ</button>
+                        <button class="key">ড</button>
+                        <button class="key">ঢ</button>
+                        <button class="key">ণ</button>
+                        <button class="key">ত</button>
+                        <button class="key">থ</button>
+                        <button class="key">দ</button>
+                        <button class="key">ধ</button>
+                        <button class="key">ন</button>
+                        <button class="key">প</button>
+                        <button class="key">ফ</button>
+                        <button class="key">ব</button>
+                        <button class="key">ভ</button>
+                        <button class="key">ম</button>
+                        <button class="key">য</button>
+                        <button class="key">র</button>
+                        <button class="key">ল</button>
+                        <button class="key">শ</button>
+                        <button class="key">ষ</button>
+                        <button class="key">স</button>
+                        <button class="key">হ</button>
+                        <button class="key">ড়</button>
+                        <button class="key">ঢ়</button>
+                        <button class="key">য়</button>
+                    </div>
+
+
+                    <!-- Telugu Keyboard -->
+                    <div class="language-keyboard" id="teluguKeyboard" style="display: none;">
+                        <button class="key">అ</button>
+                        <button class="key">ఆ</button>
+                        <button class="key">ఇ</button>
+                        <button class="key">ఈ</button>
+                        <button class="key">ఉ</button>
+                        <button class="key">ఊ</button>
+                        <button class="key">ఋ</button>
+                        <button class="key">ఎ</button>
+                        <button class="key">ఏ</button>
+                        <button class="key">ఐ</button>
+                        <button class="key">ఒ</button>
+                        <button class="key">ఓ</button>
+                        <button class="key">ఔ</button>
+                        <button class="key">క</button>
+                        <button class="key">ఖ</button>
+                        <button class="key">గ</button>
+                        <button class="key">ఘ</button>
+                        <button class="key">ఙ</button>
+                        <button class="key">చ</button>
+                        <button class="key">ఛ</button>
+                        <button class="key">జ</button>
+                        <button class="key">ఝ</button>
+                        <button class="key">ఞ</button>
+                        <button class="key">ట</button>
+                        <button class="key">ఠ</button>
+                        <button class="key">డ</button>
+                        <button class="key">ఢ</button>
+                        <button class="key">ణ</button>
+                        <button class="key">త</button>
+                        <button class="key">థ</button>
+                        <button class="key">ద</button>
+                        <button class="key">ధ</button>
+                        <button class="key">న</button>
+                        <button class="key">ప</button>
+                        <button class="key">ఫ</button>
+                        <button class="key">బ</button>
+                        <button class="key">భ</button>
+                        <button class="key">మ</button>
+                        <button class="key">య</button>
+                        <button class="key">ర</button>
+                        <button class="key">ల</button>
+                        <button class="key">వ</button>
+                        <button class="key">శ</button>
+                        <button class="key">ష</button>
+                        <button class="key">స</button>
+                        <button class="key">హ</button>
+                        <button class="key">ళ</button>
+                        <button class="key">ఱ</button>
+                    </div>
+
+
+                    <!-- Marathi Keyboard -->
+                    <div class="language-keyboard" id="marathiKeyboard" style="display: none;">
+                        <button class="key">अ</button>
+                        <button class="key">आ</button>
+                        <button class="key">इ</button>
+                        <button class="key">ई</button>
+                        <button class="key">उ</button>
+                        <button class="key">ऊ</button>
+                        <button class="key">ए</button>
+                        <button class="key">ऐ</button>
+                        <button class="key">ओ</button>
+                        <button class="key">औ</button>
+                        <button class="key">क</button>
+                        <button class="key">ख</button>
+                        <button class="key">ग</button>
+                        <button class="key">घ</button>
+                        <button class="key">च</button>
+                        <button class="key">छ</button>
+                        <button class="key">ज</button>
+                        <button class="key">झ</button>
+                        <button class="key">ञ</button>
+                        <button class="key">ट</button>
+                        <button class="key">ठ</button>
+                        <button class="key">ड</button>
+                        <button class="key">ढ</button>
+                        <button class="key">ण</button>
+                        <button class="key">त</button>
+                        <button class="key">थ</button>
+                        <button class="key">द</button>
+                        <button class="key">ध</button>
+                        <button class="key">न</button>
+                        <button class="key">प</button>
+                        <button class="key">फ</button>
+                        <button class="key">ब</button>
+                        <button class="key">भ</button>
+                        <button class="key">म</button>
+                        <button class="key">य</button>
+                        <button class="key">र</button>
+                        <button class="key">ल</button>
+                        <button class="key">व</button>
+                        <button class="key">श</button>
+                        <button class="key">ष</button>
+                        <button class="key">स</button>
+                        <button class="key">ह</button>
+                        <button class="key">ळ</button>
+                        <button class="key">ऱ</button>
+                        <button class="key">क्ष</button>
+                        <button class="key">ज्ञ</button>
+                        <button class="key">अं</button>
+                        <button class="key">अः</button>
+                    </div>
+
+
+                    <!-- Tamil Keyboard -->
+                    <div class="language-keyboard" id="tamilKeyboard" style="display: none;">
+                        <button class="key">அ</button>
+                        <button class="key">ஆ</button>
+                        <button class="key">இ</button>
+                        <button class="key">ஈ</button>
+                        <button class="key">உ</button>
+                        <button class="key">ஊ</button>
+                        <button class="key">எ</button>
+                        <button class="key">ஏ</button>
+                        <button class="key">ஐ</button>
+                        <button class="key">ஒ</button>
+                        <button class="key">ஓ</button>
+                        <button class="key">ஔ</button>
+                        <button class="key">ஃ</button>
+                        <button class="key">க</button>
+                        <button class="key">ங</button>
+                        <button class="key">ச</button>
+                        <button class="key">ஞ</button>
+                        <button class="key">ட</button>
+                        <button class="key">ண</button>
+                        <button class="key">த</button>
+                        <button class="key">ந</button>
+                        <button class="key">ப</button>
+                        <button class="key">ம</button>
+                        <button class="key">ய</button>
+                        <button class="key">ர</button>
+                        <button class="key">ல</button>
+                        <button class="key">வ</button>
+                        <button class="key">ழ</button>
+                        <button class="key">ள</button>
+                        <button class="key">ற</button>
+                        <button class="key">ன</button>
+                        <button class="key">்</button>
+                        <button class="key">ா</button>
+                        <button class="key">ி</button>
+                        <button class="key">ீ</button>
+                        <button class="key">ு</button>
+                        <button class="key">ூ</button>
+                        <button class="key">ெ</button>
+                        <button class="key">ே</button>
+                        <button class="key">ை</button>
+                        <button class="key">ொ</button>
+                        <button class="key">ோ</button>
+                        <button class="key">ௌ</button>
+                        <button class="key">ௐ</button>
+                    </div>
+
+
+                    <!-- Kannada Keyboard -->
+                    <div class="language-keyboard" id="kannadaKeyboard" style="display: none;">
+                        <button class="key">ಅ</button>
+                        <button class="key">ಆ</button>
+                        <button class="key">ಇ</button>
+                        <button class="key">ಈ</button>
+                        <button class="key">ಉ</button>
+                        <button class="key">ಊ</button>
+                        <button class="key">ಋ</button>
+                        <button class="key">ಎ</button>
+                        <button class="key">ಏ</button>
+                        <button class="key">ಐ</button>
+                        <button class="key">ಒ</button>
+                        <button class="key">ಓ</button>
+                        <button class="key">ಔ</button>
+                        <button class="key">ಂ</button>
+                        <button class="key">ಃ</button>
+                        <button class="key">ಕ</button>
+                        <button class="key">ಖ</button>
+                        <button class="key">ಗ</button>
+                        <button class="key">ಘ</button>
+                        <button class="key">ಙ</button>
+                        <button class="key">ಚ</button>
+                        <button class="key">ಛ</button>
+                        <button class="key">ಜ</button>
+                        <button class="key">ಝ</button>
+                        <button class="key">ಞ</button>
+                        <button class="key">ಟ</button>
+                        <button class="key">ಠ</button>
+                        <button class="key">ಡ</button>
+                        <button class="key">ಢ</button>
+                        <button class="key">ಣ</button>
+                        <button class="key">ತ</button>
+                        <button class="key">ಥ</button>
+                        <button class="key">ದ</button>
+                        <button class="key">ಧ</button>
+                        <button class="key">ನ</button>
+                        <button class="key">ಪ</button>
+                        <button class="key">ಫ</button>
+                        <button class="key">ಬ</button>
+                        <button class="key">ಭ</button>
+                        <button class="key">ಮ</button>
+                        <button class="key">ಯ</button>
+                        <button class="key">ರ</button>
+                        <button class="key">ಲ</button>
+                        <button class="key">ವ</button>
+                        <button class="key">ಶ</button>
+                        <button class="key">ಷ</button>
+                        <button class="key">ಸ</button>
+                        <button class="key">ಹ</button>
+                        <button class="key">ಳ</button>
+                        <button class="key">ೠ</button>
+                        <button class="key">ೡ</button>
+                        <button class="key">ೢ</button>
+                        <button class="key">ೣ</button>
+                        <button class="key">೦</button>
+                        <button class="key">೧</button>
+                        <button class="key">೨</button>
+                        <button class="key">೩</button>
+                        <button class="key">೪</button>
+                        <button class="key">೫</button>
+                        <button class="key">೬</button>
+                        <button class="key">೭</button>
+                        <button class="key">೮</button>
+                        <button class="key">೯</button>
+                    </div>
+
+
+                    <!-- Gujarati Keyboard -->
+                    <div class="language-keyboard" id="gujaratiKeyboard" style="display: none;"> 
+                        <button class="key">અ</button>
+                        <button class="key">આ</button>
+                        <button class="key">ઇ</button>
+                        <button class="key">ઈ</button>
+                        <button class="key">ઉ</button>
+                        <button class="key">ઊ</button>
+                        <button class="key">ઋ</button>
+                        <button class="key">એ</button>
+                        <button class="key">ઐ</button>
+                        <button class="key">ઓ</button>
+                        <button class="key">ઔ</button>
+                        <button class="key">ક</button>
+                        <button class="key">ખ</button>
+                        <button class="key">ગ</button>
+                        <button class="key">ઘ</button>
+                        <button class="key">ઙ</button>
+                        <button class="key">ચ</button>
+                        <button class="key">છ</button>
+                        <button class="key">જ</button>
+                        <button class="key">ઝ</button>
+                        <button class="key">ઞ</button>
+                        <button class="key">ટ</button>
+                        <button class="key">ઠ</button>
+                        <button class="key">ડ</button>
+                        <button class="key">ઢ</button>
+                        <button class="key">ણ</button>
+                        <button class="key">ત</button>
+                        <button class="key">થ</button>
+                        <button class="key">દ</button>
+                        <button class="key">ધ</button>
+                        <button class="key">ન</button>
+                        <button class="key">પ</button>
+                        <button class="key">ફ</button>
+                        <button class="key">બ</button>
+                        <button class="key">ભ</button>
+                        <button class="key">મ</button>
+                        <button class="key">ય</button>
+                        <button class="key">ર</button>
+                        <button class="key">લ</button>
+                        <button class="key">ળ</button>
+                        <button class="key">વ</button>
+                        <button class="key">શ</button>
+                        <button class="key">ષ</button>
+                        <button class="key">સ</button>
+                        <button class="key">હ</button>
+                        <button class="key">ા</button>
+                        <button class="key">િ</button>
+                        <button class="key">ી</button>
+                        <button class="key">ુ</button>
+                        <button class="key">ૂ</button>
+                        <button class="key">ૃ</button>
+                        <button class="key">ૅ</button>
+                        <button class="key">ે</button>
+                        <button class="key">ૈ</button>
+                        <button class="key">ૉ</button>
+                        <button class="key">ો</button>
+                        <button class="key">ૌ</button>
+                        <button class="key">ં</button>
+                        <button class="key">ઃ</button>
+                        <button class="key">ૐ</button>
+                        <button class="key">૦</button>
+                        <button class="key">૧</button>
+                        <button class="key">૨</button>
+                        <button class="key">૩</button>
+                        <button class="key">૪</button>
+                        <button class="key">૫</button>
+                        <button class="key">૬</button>
+                        <button class="key">૭</button>
+                        <button class="key">૮</button>
+                        <button class="key">૯</button>
+                    </div>
+
+                    <!-- Malayalam Keyboard -->
+                    <div class="language-keyboard" id="malayalamKeyboard" style="display: none;">
+                        <button class="key">അ</button>
+                        <button class="key">ആ</button>
+                        <button class="key">ഇ</button>
+                        <button class="key">ഈ</button>
+                        <button class="key">ഉ</button>
+                        <button class="key">ഊ</button>
+                        <button class="key">ഋ</button>
+                        <button class="key">എ</button>
+                        <button class="key">ഏ</button>
+                        <button class="key">ഐ</button>
+                        <button class="key">ഒ</button>
+                        <button class="key">ഓ</button>
+                        <button class="key">ഔ</button>
+                        <button class="key">ക</button>
+                        <button class="key">ഖ</button>
+                        <button class="key">ഗ</button>
+                        <button class="key">ഘ</button>
+                        <button class="key">ങ</button>
+                        <button class="key">ച</button>
+                        <button class="key">ഛ</button>
+                        <button class="key">ജ</button>
+                        <button class="key">ഝ</button>
+                        <button class="key">ഞ</button>
+                        <button class="key">ട</button>
+                        <button class="key">ഠ</button>
+                        <button class="key">ഡ</button>
+                        <button class="key">ഢ</button>
+                        <button class="key">ണ</button>
+                        <button class="key">ത</button>
+                        <button class="key">ഥ</button>
+                        <button class="key">ദ</button>
+                        <button class="key">ധ</button>
+                        <button class="key">ന</button>
+                        <button class="key">പ</button>
+                        <button class="key">ഫ</button>
+                        <button class="key">ബ</button>
+                        <button class="key">ഭ</button>
+                        <button class="key">മ</button>
+                        <button class="key">യ</button>
+                        <button class="key">ര</button>
+                        <button class="key">റ</button>
+                        <button class="key">ല</button>
+                        <button class="key">ള</button>
+                        <button class="key">ഴ</button>
+                        <button class="key">വ</button>
+                        <button class="key">ശ</button>
+                        <button class="key">ഷ</button>
+                        <button class="key">സ</button>
+                        <button class="key">ഹ</button>
+                        <button class="key">ാ</button>
+                        <button class="key">ി</button>
+                        <button class="key">ീ</button>
+                        <button class="key">ു</button>
+                        <button class="key">ൂ</button>
+                        <button class="key">ൃ</button>
+                        <button class="key">െ</button>
+                        <button class="key">േ</button>
+                        <button class="key">ൈ</button>
+                        <button class="key">ൊ</button>
+                        <button class="key">ോ</button>
+                        <button class="key">ൌ</button>
+                        <button class="key">ം</button>
+                        <button class="key">ഃ</button>
+                        <button class="key">ക്ഷ</button>
+                        <button class="key">ജ്ഞ</button>
+                        <button class="key">൦</button>
+                        <button class="key">൧</button>
+                        <button class="key">൨</button>
+                        <button class="key">൩</button>
+                        <button class="key">൪</button>
+                        <button class="key">൫</button>
+                        <button class="key">൬</button>
+                        <button class="key">൭</button>
+                        <button class="key">൮</button>
+                        <button class="key">൯</button>
+                    </div>
+
+
+                    <!-- Punjabi Keyboard -->
+                    <div class="language-keyboard" id="punjabiKeyboard" style="display: none;">
+                        <button class="key">ਅ</button>
+                        <button class="key">ਆ</button>
+                        <button class="key">ਇ</button>
+                        <button class="key">ਈ</button>
+                        <button class="key">ਉ</button>
+                        <button class="key">ਊ</button>
+                        <button class="key">ਏ</button>
+                        <button class="key">ਐ</button>
+                        <button class="key">ਓ</button>
+                        <button class="key">ਔ</button>
+                        <button class="key">ਕ</button>
+                        <button class="key">ਖ</button>
+                        <button class="key">ਗ</button>
+                        <button class="key">ਘ</button>
+                        <button class="key">ਙ</button>
+                        <button class="key">ਚ</button>
+                        <button class="key">ਛ</button>
+                        <button class="key">ਜ</button>
+                        <button class="key">ਝ</button>
+                        <button class="key">ਞ</button>
+                        <button class="key">ਟ</button>
+                        <button class="key">ਠ</button>
+                        <button class="key">ਡ</button>
+                        <button class="key">ਢ</button>
+                        <button class="key">ਣ</button>
+                        <button class="key">ਤ</button>
+                        <button class="key">ਥ</button>
+                        <button class="key">ਦ</button>
+                        <button class="key">ਧ</button>
+                        <button class="key">ਨ</button>
+                        <button class="key">ਪ</button>
+                        <button class="key">ਫ</button>
+                        <button class="key">ਬ</button>
+                        <button class="key">ਭ</button>
+                        <button class="key">ਮ</button>
+                        <button class="key">ਯ</button>
+                        <button class="key">ਰ</button>
+                        <button class="key">ਲ</button>
+                        <button class="key">ਲ਼</button>
+                        <button class="key">ਵ</button>
+                        <button class="key">ਸ਼</button>
+                        <button class="key">ਸ</button>
+                        <button class="key">ਹ</button>
+                        <button class="key">ਾ</button>
+                        <button class="key">ਿ</button>
+                        <button class="key">ੀ</button>
+                        <button class="key">ੁ</button>
+                        <button class="key">ੂ</button>
+                        <button class="key">ੇ</button>
+                        <button class="key">ੈ</button>
+                        <button class="key">ੋ</button>
+                        <button class="key">ੌ</button>
+                        <button class="key">ੰ</button>
+                        <button class="key">ੱ</button>
+                        <button class="key">ੳ</button>
+                        <button class="key">ਖ਼</button>
+                        <button class="key">ਗ਼</button>
+                        <button class="key">ਜ਼</button>
+                        <button class="key">ਫ਼</button>
+                        <button class="key">ੜ</button>
+                        <button class="key">ਫ਼</button>
+                        <button class="key">ੰਗ</button>
+                        <button class="key">ੱਛ</button>
+                        <button class="key">ੱਝ</button>
+                        <button class="key">ੱਭ</button>
+                        <button class="key">ੱਢ</button>
+                        <button class="key">ੱਧ</button>
+                        <button class="key">ੱਤ</button>
+                        <button class="key">ੱਥ</button>
+                        <button class="key">ੱਦ</button>
+                        <button class="key">ੱਨ</button>
+                    </div>
+
+
+                    <!-- Odia Keyboard -->
+                    <div class="language-keyboard" id="odiaKeyboard" style="display: none;">
+                        <button class="key">ଅ</button>
+                        <button class="key">ଆ</button>
+                        <button class="key">ଇ</button>
+                        <button class="key">ଈ</button>
+                        <button class="key">ଉ</button>
+                        <button class="key">ଊ</button>
+                        <button class="key">ଋ</button>
+                        <button class="key">ଏ</button>
+                        <button class="key">ଐ</button>
+                        <button class="key">ଓ</button>
+                        <button class="key">ଔ</button>
+                        <button class="key">କ</button>
+                        <button class="key">ଖ</button>
+                        <button class="key">ଗ</button>
+                        <button class="key">ଘ</button>
+                        <button class="key">ଙ</button>
+                        <button class="key">ଚ</button>
+                        <button class="key">ଛ</button>
+                        <button class="key">ଜ</button>
+                        <button class="key">ଝ</button>
+                        <button class="key">ଞ</button>
+                        <button class="key">ଟ</button>
+                        <button class="key">ଠ</button>
+                        <button class="key">ଡ</button>
+                        <button class="key">ଢ</button>
+                        <button class="key">ଣ</button>
+                        <button class="key">ତ</button>
+                        <button class="key">ଥ</button>
+                        <button class="key">ଦ</button>
+                        <button class="key">ଧ</button>
+                        <button class="key">ନ</button>
+                        <button class="key">ପ</button>
+                        <button class="key">ଫ</button>
+                        <button class="key">ବ</button>
+                        <button class="key">ଭ</button>
+                        <button class="key">ମ</button>
+                        <button class="key">ଯ</button>
+                        <button class="key">ର</button>
+                        <button class="key">ଲ</button>
+                        <button class="key">ଳ</button>
+                        <button class="key">ଵ</button>
+                        <button class="key">ଶ</button>
+                        <button class="key">ଷ</button>
+                        <button class="key">ସ</button>
+                        <button class="key">ହ</button>
+                        <button class="key">ଽ</button>
+                        <button class="key">ା</button>
+                        <button class="key">ି</button>
+                        <button class="key">ୀ</button>
+                        <button class="key">ୁ</button>
+                        <button class="key">ୂ</button>
+                        <button class="key">ୃ</button>
+                        <button class="key">େ</button>
+                        <button class="key">ୈ</button>
+                        <button class="key">ୋ</button>
+                        <button class="key">ୌ</button>
+                        <button class="key">୍</button>
+                        <button class="key">ୗ</button>
+                        <button class="key">ଂ</button>
+                        <button class="key">ଃ</button>
+                        <button class="key">ଁ</button>
+                        <button class="key">ଃ</button>
+                    </div>
+
+
+                    <!-- Assamese Keyboard -->
+                    <div class="language-keyboard" id="assameseKeyboard" style="display: none;">
+                        <button class="key">অ</button>
+                        <button class="key">আ</button>
+                        <button class="key">ই</button>
+                        <button class="key">ঈ</button>
+                        <button class="key">উ</button>
+                        <button class="key">ঊ</button>
+                        <button class="key">ঋ</button>
+                        <button class="key">এ</button>
+                        <button class="key">ঐ</button>
+                        <button class="key">ও</button>
+                        <button class="key">ঔ</button>
+                        <button class="key">ক</button>
+                        <button class="key">খ</button>
+                        <button class="key">গ</button>
+                        <button class="key">ঘ</button>
+                        <button class="key">ঙ</button>
+                        <button class="key">চ</button>
+                        <button class="key">ছ</button>
+                        <button class="key">জ</button>
+                        <button class="key">ঝ</button>
+                        <button class="key">ঞ</button>
+                        <button class="key">ট</button>
+                        <button class="key">ঠ</button>
+                        <button class="key">ড</button>
+                        <button class="key">ঢ</button>
+                        <button class="key">ণ</button>
+                        <button class="key">ত</button>
+                        <button class="key">থ</button>
+                        <button class="key">দ</button>
+                        <button class="key">ধ</button>
+                        <button class="key">ন</button>
+                        <button class="key">প</button>
+                        <button class="key">ফ</button>
+                        <button class="key">ব</button>
+                        <button class="key">ভ</button>
+                        <button class="key">ম</button>
+                        <button class="key">য</button>
+                        <button class="key">ৰ</button>
+                        <button class="key">ল</button>
+                        <button class="key">শ</button>
+                        <button class="key">ষ</button>
+                        <button class="key">স</button>
+                        <button class="key">হ</button>
+                        <button class="key">ৱ</button>
+                        <button class="key">ং</button>
+                        <button class="key">ঃ</button>
+                        <button class="key">ঁ</button>
+                        <button class="key">ঽ</button>
+                        <button class="key">া</button>
+                        <button class="key">ি</button>
+                        <button class="key">ী</button>
+                        <button class="key">ু</button>
+                        <button class="key">ূ</button>
+                        <button class="key">ৃ</button>
+                        <button class="key">ে</button>
+                        <button class="key">ৈ</button>
+                        <button class="key">ো</button>
+                        <button class="key">ৌ</button>
+                        <button class="key">্</button>
+                        <button class="key">ৎ</button>
+                    </div>
+                    <!-- Assamese Keyboard -->
+                    <div class="language-keyboard" id="assameseKeyboard" style="display: none;">
+                        <button class="key">অ</button>
+                        <button class="key">আ</button>
+                        <button class="key">ই</button>
+                        <button class="key">ঈ</button>
+                        <button class="key">উ</button>
+                        <button class="key">ঊ</button>
+                        <button class="key">ঋ</button>
+                        <button class="key">এ</button>
+                        <button class="key">ঐ</button>
+                        <button class="key">ও</button>
+                        <button class="key">ঔ</button>
+                        <button class="key">ক</button>
+                        <button class="key">খ</button>
+                        <button class="key">গ</button>
+                        <button class="key">ঘ</button>
+                        <button class="key">ঙ</button>
+                        <button class="key">চ</button>
+                        <button class="key">ছ</button>
+                        <button class="key">জ</button>
+                        <button class="key">ঝ</button>
+                        <button class="key">ঞ</button>
+                        <button class="key">ট</button>
+                        <button class="key">ঠ</button>
+                        <button class="key">ড</button>
+                        <button class="key">ঢ</button>
+                        <button class="key">ণ</button>
+                        <button class="key">ত</button>
+                        <button class="key">থ</button>
+                        <button class="key">দ</button>
+                        <button class="key">ধ</button>
+                        <button class="key">ন</button>
+                        <button class="key">প</button>
+                        <button class="key">ফ</button>
+                        <button class="key">ব</button>
+                        <button class="key">ভ</button>
+                        <button class="key">ম</button>
+                        <button class="key">য</button>
+                        <button class="key">ৰ</button>
+                        <button class="key">ল</button>
+                        <button class="key">শ</button>
+                        <button class="key">ষ</button>
+                        <button class="key">স</button>
+                        <button class="key">হ</button>
+                        <button class="key">ৱ</button>
+                        <button class="key">ং</button>
+                        <button class="key">ঃ</button>
+                        <button class="key">ঁ</button>
+                        <button class="key">ঽ</button>
+                        <button class="key">া</button>
+                        <button class="key">ি</button>
+                        <button class="key">ী</button>
+                        <button class="key">ু</button>
+                        <button class="key">ূ</button>
+                        <button class="key">ৃ</button>
+                        <button class="key">ে</button>
+                        <button class="key">ৈ</button>
+                        <button class="key">ো</button>
+                        <button class="key">ৌ</button>
+                        <button class="key">্</button>
+                        <button class="key">ৎ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+    
+        <div id="image-gallery">
+            <div id="image-list-container">
+                <div id="image-list">
+                <!-- List of images will appear here -->
+                
+                </div>
+                <div id="fetched-images">
+                    <!-- Fetched image gallery will be displayed here -->
+                </div>
+            </div>
+            
+        </div>
+        
+        
+       
+</div>
+            
+        
+    
+    
+   
+    
+    </main>
+    <main><h2>Annotations</h2>
+    <table id="annotationsTable">
+        <thead>
+        <tr>
+            <th>created_at</th>
+            <th>Image</th>
+            <th>Text</th>
+            <th>Validation Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+            <!-- {% for annotation in annotations %}
+            <tr>
+                <td>{{ annotation.image.title }}</td>
+                <td>{{ annotation.text }}</td>
+                <td>
+                     Edit button 
+                    <button onclick="editAnnotation({{ annotation.text }})">Edit</button>
+                    Delete button 
+                    <button onclick="deleteAnnotation({{ annotation.text  }}, this)">Delete</button>
+                </td>
+            </tr>
+            {% endfor %} -->
+        </tbody>
+    </table>
+    <button class="btn-danger" onclick="undoDelete()">Undo Deletion</button>
+    <button onclick="downloadAnnotations()">Download Annotations</button>
+    </div>
+    </main>
+    </main>
+    
+</body>    
+
+
+<script>
+    const imageUpload = document.getElementById('imageUpload');
+    const previewImage = document.getElementById('previewImage');
+    let imageFiles = [];
+    let currentImageIndex = -1;
+    let deletedImagesStack = [];
+    let deletedRows = [];
+    
+
+    /*imageUpload.addEventListener('change', function() {
+        const files = this.files;
+        if (files) {
+            imageFiles = [...files];
+            currentImageIndex = 0;
+            updateImageGallery();
+        }
+    });*/
+
+    function isDuplicateAnnotation(imageName, userText) {
+        const table = document.getElementById('annotationsTable');
+        for (let i = 1; i < table.rows.length; i++) {
+            if (table.rows[i].cells[0].textContent === imageName && table.rows[i].cells[1].textContent === userText) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function addEntryToTable() {
+        if (currentImageIndex < 0 || currentImageIndex >= imageFiles.length) {
+            alert("Please select an image first.");
+            return;
+        }
+    
+        const table = document.getElementById('annotationsTable').getElementsByTagName('tbody')[0];
+        const imageId = imageFiles[currentImageIndex].id;
+        const imageName = imageFiles[currentImageIndex].title || imageFiles[currentImageIndex].src.split('/').pop();
+        const userText = document.getElementById('voiceTextInput').value;
+        const languageName = document.getElementById('imagelanguageSelect').value;
+    
+        // Generate the created_at timestamp in ISO 8601 format
+        const now = new Date();
+        const created_at = now.toISOString();
+    
+        if (isDuplicateAnnotation(imageName, userText)) {
+            alert("This annotation already exists!");
+            return;
+        }
+        
+        if (typeof imageId === 'undefined') {
+            console.error("Image ID is undefined, index:", currentImageIndex);
+            console.log("Image files loaded:", imageFiles);
+        } else {
+            submitAnnotation(created_at, imageId, userText, languageName).then(annotation => { // Include annotation data in response
+                const newRow = table.insertRow();
+    
+                let createdAtCell = newRow.insertCell(0);
+                createdAtCell.textContent = created_at; // Display the created_at timestamp in the table
+    
+                let imageCell = newRow.insertCell(1);
+                imageCell.textContent = imageName;
+    
+                let textCell = newRow.insertCell(2);
+                textCell.textContent = userText;
+    
+                let validationStatusCell = newRow.insertCell(3); // New column for validation status
+                validationStatusCell.textContent = annotation.validated ? 'Validated' : 'Not Validated'; // Display validation status
+    
+                let actionCell = newRow.insertCell(4);
+                // Add action buttons if necessary
+                const editButton = document.createElement('button');
+                editButton.innerText = "Edit";
+                editButton.onclick = function() {
+                    // Define edit behavior
+                    editAnnotation(newRow);
+                };
+                actionCell.appendChild(editButton);
+    
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = "Delete";
+                deleteButton.onclick = function() {
+                    // Define delete behavior
+                    const annotationId = this.getAttribute('data-annotation-id');
+                    deleteAnnotation(annotationId);
+                };
+                actionCell.appendChild(deleteButton);
+    
+                alert("Annotation saved successfully.");
+    
+            }).catch(error => {
+                console.error('Error submitting annotation:', error);
+                alert("Failed to save annotation.");
+            });
+        }
+    }
+    
+    function submitAnnotation(created_at ,imageId, annotationText, languageName, isValidated) {
+        const data = new FormData();
+        console.log("Submitting Image ID:", imageId);
+        data.append('created_at', created_at)
+        data.append('image_id', imageId);
+        data.append('annotation', annotationText);
+        data.append('language', languageName);
+        data.append('validated', isValidated);
+        return fetch('/newapp/create_annotation/', {
+            method: 'POST',
+            body: data,
+            credentials: 'include',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        });
+    }
+    
+    
+
+    function deleteAnnotation(annotationId) {
+    if (confirm("Are you sure you want to delete this annotation?")) {
+        // Retrieve CSRF token from meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        // Prepare the request body with the annotation ID
+        const requestData = JSON.stringify({
+            annotationId: annotationId
+        });
+
+        fetch('/newapp/delete_annotation/', { // Ensure the URL is correct
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken, // Include CSRF token in the request headers
+            },
+            body: requestData,
+            credentials: 'include' // This may be necessary depending on your Django configuration
+        })
+        .then(response => {
+            if (response.ok) {
+                // Optionally, remove the annotation from the UI or refresh the page
+                console.log("Annotation deleted successfully.");
+                // For example, if you have a function to refresh the annotations list, call it here
+                // refreshAnnotationsList();
+            } else {
+                response.json().then(data => console.error(data.error));
+                alert("Failed to delete annotation.");
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+
+
+
+
+    
+
+    
+    
+
+    /*function undoDeletedImage() {
+        if (deletedImagesStack.length > 0) {
+            const restoredImage = deletedImagesStack.pop(); // Get the last deleted image
+            imageFiles.push(restoredImage); // Restore it to the imageFiles array
+            currentImageIndex = imageFiles.length - 1; // Update current index to restored image
+            updateFocusedImage(restoredImage.src); // Update the focused image display
+            updateImageGallery(); // If you have a function to update the whole gallery
+        } else {
+            alert('No images to restore.');
+        }
+    }*/
+
+    function undoDeletedImage() {
+        if (deletedImagesStack.length > 0) {
+            const { imageFile, container } = deletedImagesStack.pop();
+    
+            // Add the image file back to the imageFiles array
+            imageFiles.push(imageFile);
+    
+            // Restore the container by setting its display property
+            container.style.display = 'inline-block';
+    
+            // Update the image gallery
+            updateImageGallery();
+        } else {
+            alert('No images to undo');
+        }
+    }
+    
+
+    function downloadImagesAsZip() {
+        try {
+            if (imageFiles.length === 0) {
+                alert("There are no images to download.");
+                return;
+            }
+
+            const zip = new JSZip();
+            const folder = zip.folder("images");
+
+            imageFiles.forEach(file => {
+                folder.file(file.name, file);
+            });
+
+            zip.generateAsync({ type: "blob" })
+            .then(content => {
+                const url = URL.createObjectURL(content);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "images.zip";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        } catch (error) {
+            console.error("Error generating ZIP:", error);
+            alert("There was an error generating the ZIP. Please try again.");
+        }
+    }
+
+    function updateImageGallery() {
+        const focusedImageDiv = document.getElementById('focused-image');
+        const imageListDiv = document.getElementById('image-list');
+        focusedImageDiv.innerHTML = '';
+        imageListDiv.innerHTML = ''; // Clear existing thumbnails
+
+        // Helper function to create thumbnail
+        function createThumbnail(image, isFetched = false) {
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'imgContainer';
+
+            const thumbnail = document.createElement('img');
+            thumbnail.src = isFetched ? image.src : URL.createObjectURL(image);
+            imgContainer.appendChild(thumbnail);
+
+            const imgLabel = document.createElement('div');
+            imgLabel.innerText = image.name;
+            imgLabel.className = 'imgLabel';
+            imgContainer.appendChild(imgLabel);
+
+            thumbnail.onclick = function() {
+                // Ensure you update this function to handle showing fetched images correctly
+                updateFocusedImage(thumbnail.src);
+            };
+
+            if (!isFetched) { // Assuming delete functionality is for uploaded images only
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-button';
+                deleteBtn.innerText = 'X';
+                deleteBtn.onclick = function() {
+                    deleteImage(image); // Ensure this function can handle both uploaded and fetched images
+                };
+                imgContainer.appendChild(deleteBtn);
+            }
+
+            imageListDiv.appendChild(imgContainer);
+        }
+
+        // Loop through uploaded images
+        imageFiles.forEach(file => {
+            createThumbnail(file);
+        });
+
+        // Loop through fetched images
+        fetchedImageFiles.forEach(file => {
+            createThumbnail(file, true);
+        });
+    }
+
+    
+
+
+
+    
+
+
+    
+    function searchImages() {
+        var input, filter, imgContainers, img, i, imgLabel, txtValue;
+    input = document.getElementById("searchBar");
+    filter = input.value.toUpperCase();
+    imgContainers = document.getElementById("image-list").getElementsByClassName('imgContainer');
+
+    // Search and display images
+    for (i = 0; i < imgContainers.length; i++) {
+        img = imgContainers[i].getElementsByTagName('img')[0]; // Get the image inside the container
+        imgLabel = imgContainers[i].getElementsByClassName('imgLabel')[0]; // Get the label inside the container
+        txtValue = img.alt || imgLabel.innerText; // Use alt attribute or the innerText of the label
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            imgContainers[i].style.display = "";
+        } else {
+            imgContainers[i].style.display = "none";
+        }
+    }
+
+    // Hide all annotation containers initially
+    var annotationContainers = document.getElementsByClassName('annotationContainer');
+    for (i = 0; i < annotationContainers.length; i++) {
+        annotationContainers[i].style.display = "none";
+    }
+
+    // Show annotations related to the searched image
+    var searchedImage = filter.trim(); // Get the searched image name
+    var relatedAnnotations = document.querySelectorAll('[data-image-name="' + searchedImage + '"]');
+    for (i = 0; i < relatedAnnotations.length; i++) {
+        relatedAnnotations[i].style.display = "";
+    }
+}
+    
+
+    
+
+    function deleteImage(index) {
+        if (index >= 0 && index < imageFiles.length) {
+            // Remove the image file from the array
+            const deletedImage = imageFiles.splice(index, 1)[0]; // Remove and get the deleted image
+    
+            // Adjust the current image index if necessary
+            if (currentImageIndex >= index) {
+                currentImageIndex--;
+            }
+    
+            // Create an object to store the deleted image and its container
+            const deletedImageInfo = {
+                imageFile: deletedImage,
+                container: document.querySelector(".thumbnail-container:nth-child(" + (index + 2) + ")") // Adjust the index
+            };
+    
+            // Push the deleted image info to the deletedImagesStack
+            deletedImagesStack.push(deletedImageInfo);
+    
+            // Update the image gallery
+            updateImageGallery();
+        }
+    }
+    
+
+    function showNextImage() {
+        if (currentImageIndex < imageFiles.length - 1) {
+            currentImageIndex++;
+            updateFocusedImage(imageFiles[currentImageIndex].src); // Assuming each image file has a .src property
+        } else {
+            alert('You are at the last image.');
+        }
+    }
+    
+
+    function showPreviousImage() {
+        if (currentImageIndex > 0) {
+            currentImageIndex--;
+            updateFocusedImage(imageFiles[currentImageIndex].src); // Assuming each image file has a .src property
+        } else {
+            alert('You are at the first image.');
+        }
+    }
+
+    // Other JavaScript code...
+    
+    
+
+
+    function downloadAnnotations() {
+        try {
+            const table = document.getElementById('annotationsTable');
+            
+            if (table.rows.length <= 1) { // Assuming there's a header row
+                alert("There are no annotations to download.");
+                return;
+            }
+            
+            let csv = [];
+            for (let i = 0, row; row = table.rows[i]; i++) {
+                let tmpCol = [];
+                for (let j = 0, col; col = row.cells[j]; j++) {
+                    tmpCol.push(col.textContent);
+                }
+                csv.push(tmpCol.join(","));
+            }
+            const csvData = csv.join("\n");
+            const blob = new Blob([csvData], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+    
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'annotations.csv');
+    
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error("Error downloading annotations:", error);
+            alert("There was an error downloading the annotations. Please try again.");
+        }
+    }
+    
+    let recognition;
+    let final_transcript = '';
+    let mediaRecorder;
+    let audioChunks = [];
+
+    if (window.hasOwnProperty('webkitSpeechRecognition')) {
+        recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "en-US";
+
+        recognition.onresult = function (event) {
+            let interim_transcript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript;
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+
+            document.getElementById('voiceTextInput').value = final_transcript + interim_transcript;
+        };
+
+        recognition.onerror = function (event) {
+            console.error('Speech recognition error:', event);
+            stopDictation();
+        };
+
+    } else {
+        alert("Your browser does not support voice recognition. Please try in Chrome.");
+    }
+
+    // Function to start recording and send data to Vosk server for speech recognition
+
+    function setupRecognition() {
+        if (window.hasOwnProperty('webkitSpeechRecognition')) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = document.getElementById('languageSelect').value;
+    
+            recognition.onresult = function (event) {
+                let interim_transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        final_transcript += event.results[i][0].transcript;
+                    } else {
+                        interim_transcript += event.results[i][0].transcript;
+                    }
+                }
+                document.getElementById('voiceTextInput').value = final_transcript + interim_transcript;
+            };
+    
+            recognition.onerror = function (event) {
+                console.error('Speech recognition error:', event);
+                stopDictation();
+            };
+    
+        } else {
+            alert("Your browser does not support voice recognition. Please try in Chrome.");
+        }
+    }
+    
+function startDictation() {
+    final_transcript = '';
+    setupRecognition(); // Set up recognition with the selected language
+    if (recognition) {
+        recognition.start();
+    }
+}
+
+
+function pauseDictation() {
+    if (recognition) {
+        recognition.stop();
+    }
+}
+
+function stopDictation() {
+    if (recognition) {
+        recognition.stop();
+        final_transcript = '';
+    }
+}
+
+
+function displayFetchedImages(images) {
+    const imageListDiv = document.getElementById('image-list');
+    imageListDiv.innerHTML = ''; // Clear existing images
+    imageFiles = []; // Reset the imageFiles array for new fetched images
+
+    images.forEach((imageData, index) => {
+        // Ensure imageData has the properties you expect
+        if (imageData && imageData.image) { // Use imageData.image instead of imageData.src
+            const imgContainer = document.createElement('div');
+            imgContainer.className = 'imgContainer';
+
+            const thumbnail = document.createElement('img');
+            thumbnail.src = '/media/' + imageData.image; // Use the image property for the image source
+            thumbnail.alt = imageData.title || 'Image'; // Fallback title if none provided
+            imgContainer.appendChild(thumbnail);
+
+            const imgLabel = document.createElement('div');
+            imgLabel.innerText = imageData.title || 'Default Title';
+            imgLabel.className = 'imgLabel';
+            imgContainer.appendChild(imgLabel);
+
+            // Add event listener to update focused image on click
+            thumbnail.onclick = function() {
+                currentImageIndex = index; // Set current image index to this image
+                updateFocusedImage(imageData.image); // Update the focused image using imageData.image
+            };
+
+            imageListDiv.appendChild(imgContainer); // Append the container to the image list div
+
+            // Add the image data to the imageFiles array
+            imageFiles.push({
+                id: imageData.id, 
+                src: imageData.image, // Use imageData.image here
+                title: imageData.title || 'Image' // Optional: include title or other metadata
+            });
+        }
+    });
+
+    if (images.length > 0) {
+        // Set the first image as the focused image initially
+        currentImageIndex = 0;
+        updateFocusedImage(imageFiles[0].src);
+    }
+}
+
+
+function updateFocusedImage(src) {
+    const focusedImageDiv = document.getElementById('focused-image');
+    focusedImageDiv.innerHTML = ''; // Clear the current preview
+    const img = document.createElement('img');
+    img.src = '/media/' + src;
+    focusedImageDiv.appendChild(img);
+}
+
+
+</script>
+    
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+    // Get the select element
+    const languageSelect = document.getElementById('imagelanguageSelect');
+
+    // Fetch images when the language selection changes
+    languageSelect.addEventListener('change', function() {
+        const selectedLanguage = this.value;
+        fetchImagesFromLanguageFolder(selectedLanguage);
+    });
+
+    // Optionally, fetch images for the initially selected language
+    // Remove this line if you don't want to fetch images until the user makes a selection
+    //fetchImagesFromLanguageFolder(languageSelect.value);
+});
+    
+    function fetchImagesFromLanguageFolder(language) {
+        fetch(`/newapp/get_images_from_language?language=${language}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCsrfToken(), // Ensure CSRF token is included for Django
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                console.error('Server returned an error response:', response);
+            }
+        })
+        .then(data => {
+            if (data && data.images) {
+                console.log("Daata to display:", data.images);
+                if(data.images == 0){
+                    alert("You dont have images for selected language")
+                }
+
+                displayFetchedImages(data.images);
+            }
+            else {
+                // Handle case where images are not in the expected format or path
+                console.error('Images array is missing or undefined in the response:', data);
+            }
+        })
+        .catch((error) => {
+             console.error('Error:', error);
+            
+        });
+    }
+    function getCsrfToken() {
+        // Assuming you have a meta tag with name="csrf-token" in your HTML
+        const csrfTokenMetaTag = document.querySelector('meta[name="csrf-token"]');
+        
+        if (csrfTokenMetaTag) {
+            return csrfTokenMetaTag.content;
+        } else {
+            console.error('CSRF token not found.');
+            return null;
+        }
+    }
+   
+
+    
+</script>
+<script>
+function fetchAndDisplayAnnotations(language) {
+    fetch(`/newapp/get_annotations_from_language/?language=${language}`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCsrfToken(), // Ensure CSRF token is included
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.annotations) {
+            updateAnnotationsTable(data.annotations);
+        }
+    })
+    .catch(error => console.error('Error fetching annotations:', error));
+}
+
+function updateAnnotationsTable(annotations) {
+    const tableBody = document.getElementById('annotationsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = ''; // Clear existing rows
+    
+    annotations.forEach(annotation => {
+        const newRow = tableBody.insertRow();
+        
+        let created_atCell = newRow.insertCell(0)
+        created_atCell.textContent = annotation.created_at;
+
+        let imageCell = newRow.insertCell(1);
+        imageCell.textContent = annotation.image__title;
+        
+        let textCell = newRow.insertCell(2);
+        textCell.textContent = annotation.annotation;
+        
+        let validationStatusCell = newRow.insertCell(3);
+        validationStatusCell.textContent = annotation.validated ? 'Validated' : 'Not Validated'; // Display validation status
+        
+        let actionCell = newRow.insertCell(4);
+        
+        const editButton = document.createElement('button');
+        editButton.innerText = "Edit";
+        editButton.onclick = function() {
+            // Define edit behavior
+            editAnnotation(newRow);
+        };
+        actionCell.appendChild(editButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = "Delete";
+        deleteButton.setAttribute('data-annotation-id', annotation.id); // Ensure this is correctly retrieving the annotation ID
+        deleteButton.onclick = function() {
+            deleteAnnotation(this.getAttribute('data-annotation-id'));
+        };
+        actionCell.appendChild(deleteButton);
+
+        // Add any desired buttons/actions for each annotation row here
+        
+        // Initially show all rows
+        newRow.style.display = ""; 
+    });
+}
+
+
+
+// Listen for language selection changes and fetch annotations
+document.getElementById('imagelanguageSelect').addEventListener('change', function() {
+    const selectedLanguage = this.value;
+    fetchAndDisplayAnnotations(selectedLanguage);
+});
+
+
+
+
+
+</script>
+
+</html>
+<!-- function submitAnnotation(imageId, annotationText, languageName) {
+    const data = new FormData();
+    data.append('image_id', imageId);
+    data.append('annotation', annotationText);
+    data.append('language', languageName);
+
+    fetch('/newapp/create_annotation/', {
+        method: 'POST',
+        body: data,
+        credentials: 'include',  // To ensure cookies, such as CSRF tokens, are sent
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log(data.success);
+            // Optionally, update the UI to reflect the newly saved annotation
+        } else if (data.error) {
+            console.error(data.error);
+        }
+    })
+    .catch(error => console.error('Error saving annotation:', error));
+} -->
+
+<script>
+    let useVirtualKeyboard = false;
+
+    document.getElementById('languageSelect').addEventListener('change', function() {
+    var selectedLanguage = this.value;
+    console.log("Selected Language: ", selectedLanguage);  // Log selected language
+    showRelevantKeyboard(selectedLanguage);
+});
+
+
+function showRelevantKeyboard(language) {
+    // Hide all keyboards initially
+    console.log("Showing keyboard for: ", language);
+    var keyboards = document.querySelectorAll('.language-keyboard');
+    keyboards.forEach(function(keyboard) {
+        keyboard.style.display = 'none';
+    });
+
+    // Map language codes to specific keyboard div IDs
+    var languageToKeyboard = {
+        'en-IN': 'englishKeyboard',
+        'hi-IN': 'hindiKeyboard',
+        // Ensure all mappings are correct and correspond to actual div IDs
+        'bn-IN': 'bengaliKeyboard',
+        'te-IN': 'teluguKeyboard',
+        'mr-IN': 'marathiKeyboard',
+        'ta-IN': 'tamilKeyboard',
+        'kn-IN': 'kannadaKeyboard',
+        'gu-IN': 'gujaratiKeyboard',
+        'ml-IN': 'malayalamKeyboard',
+        'pa-IN': 'punjabiKeyboard',
+        'or-IN': 'odiaKeyboard',
+        'asm-IN': 'assameseKeyboard'
+    };
+
+    // Display the keyboard for the selected language
+    var keyboardId = languageToKeyboard[language];
+    console.log("Displaying keyboard: ", keyboardId);  // Log after getting the keyboardId
+
+    if (keyboardId) {
+        document.getElementById(keyboardId).style.display = 'block';
+    } else {
+        console.log("Error: No keyboard ID found for language", language);
+    }
+}
+
+let isVirtualKeyboardOpen = false;
+
+function openVirtualKeyboard() {
+    if (!isVirtualKeyboardOpen) {
+        var selectedLanguage = document.getElementById('languageSelect').value;
+        showRelevantKeyboard(selectedLanguage); // Show the correct keyboard when opening
+        // Set focus on the text input field
+        document.getElementById('voiceTextInput').focus();
+        isVirtualKeyboardOpen = true;
+    } else {
+        // Hide the virtual keyboard
+        document.querySelectorAll('.language-keyboard').forEach(function(keyboard) {
+            keyboard.style.display = 'none';
+        });
+        isVirtualKeyboardOpen = false;
+    }
+}
+
+
+document.querySelectorAll('.key').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var key = this.textContent; // Get the text content of the clicked button
+        typeKey(key); // Call the typeKey function with the button text
+    });
+});
+
+    function typeKey(key) {
+        // Type the selected key into the text input field
+        document.getElementById('voiceTextInput').value += key;
+    }
+
+    function addEntryToTable() {
+        // Your existing code...
+
+        if (isErrorInVoiceDetection && useVirtualKeyboard) {
+            // Handle typing using the virtual keyboard
+            // No need to do anything here, as typing is directly handled by the virtual keyboard
+        } else {
+            // Handle typing using voice recognition or physical keyboard
+            const userText = document.getElementById('voiceTextInput').value;
+            // Your existing code...
+        }
+
+        // Reset the flag and hide the virtual keyboard
+        useVirtualKeyboard = false;
+        document.getElementById('virtualKeyboard').style.display = 'none';
+    }
+
+
+    function addEntryToTable() {
+    if (currentImageIndex < 0 || currentImageIndex >= imageFiles.length) {
+        alert("Please select an image first.");
+        return;
+    }
+
+    const table = document.getElementById('annotationsTable').getElementsByTagName('tbody')[0];
+    const imageId = imageFiles[currentImageIndex].id;
+    const imageName = imageFiles[currentImageIndex].title || imageFiles[currentImageIndex].src.split('/').pop();
+    let userText;
+
+    // Check if virtual keyboard is in use and there's an error in voice detection
+    if (useVirtualKeyboard && isErrorInVoiceDetection) {
+        // Handle typing using the virtual keyboard
+        userText = document.getElementById('voiceTextInput').value;
+    } else {
+        // Handle typing using voice recognition or physical keyboard
+        // For simplicity, assuming the userText is directly retrieved from the text input field
+        userText = document.getElementById('voiceTextInput').value;
+    }
+
+    const languageName = document.getElementById('imagelanguageSelect').value;
+
+    if (isDuplicateAnnotation(imageName, userText)) {
+        alert("This annotation already exists!");
+        return;
+    }
+
+    if (typeof imageId === 'undefined') {
+        console.error("Image ID is undefined, index:", currentImageIndex);
+        console.log("Image files loaded:", imageFiles);
+    } else {
+        submitAnnotation(imageId, userText, languageName).then(() => {
+            const newRow = table.insertRow();
+
+            let imageCell = newRow.insertCell(0);
+            imageCell.textContent = imageName;
+
+            let textCell = newRow.insertCell(1);
+            textCell.textContent = userText;
+
+            let actionCell = newRow.insertCell(2);
+            // Add action buttons if necessary
+            const editButton = document.createElement('button');
+            editButton.innerText = "Edit";
+            editButton.onclick = function() {
+                // Define edit behavior
+                editAnnotation(newRow);
+            };
+            actionCell.appendChild(editButton);
+
+            // Create Delete Button
+            const deleteButton = document.createElement('button');
+            deleteButton.innerText = "Delete";
+            deleteButton.onclick = function() {
+                // Define delete behavior
+                const annotationId = this.getAttribute('data-annotation-id');
+                deleteAnnotation(annotationId);
+            };
+            actionCell.appendChild(deleteButton);
+
+            alert("Annotation saved successfully.");
+
+        }).catch(error => {
+            console.error('Error submitting annotation:', error);
+            alert("Failed to save annotation.");
+        });
+    }
+}
+
+
+
+// Initialize Virtual Keyboard for English
+$('#englishKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        'shift': ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', '@'],
+        'alt': ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.com'],
+        'alt-shift': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+    },
+    usePreview: false, // Disable key previews
+    autoAccept: true // Automatically accept key input
+});
+
+
+// Initialize Virtual Keyboard for Hindi
+$('#hindiKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ए', 'ऐ', 'ओ', 'औ'],
+        'shift': ['क', 'ख', 'ग', 'घ', 'ङ', 'च', 'छ', 'ज', 'झ', 'ञ'],
+        'alt': ['ट', 'ठ', 'ड', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न'],
+        'alt-shift': ['प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श']
+    },
+    usePreview: false, // Disable key previews
+    autoAccept: true // Automatically accept key input
+});
+// Initialize Virtual Keyboard for Bengali
+$('#bengaliKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ'],
+        'shift': ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'],
+        'alt': ['ট', 'ঠ', 'ড', 'ঢ', 'ণ', 'ত', 'থ', 'দ', 'ধ', 'ন'],
+        'alt-shift': ['প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Telugu
+$('#teluguKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['అ', 'ఆ', 'ఇ', 'ఈ', 'ఉ', 'ఊ', 'ఋ', 'ఎ', 'ఏ', 'ఐ', 'ఒ', 'ఓ', 'ఔ'],
+        'shift': ['క', 'ఖ', 'గ', 'ఘ', 'ఙ', 'చ', 'ఛ', 'జ', 'ఝ', 'ఞ'],
+        'alt': ['ట', 'ఠ', 'డ', 'ఢ', 'ణ', 'త', 'థ', 'ద', 'ధ', 'న'],
+        'alt-shift': ['ప', 'ఫ', 'బ', 'భ', 'మ', 'య', 'ర', 'ల', 'వ', 'శ', 'ష']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Marathi
+$('#marathiKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['अ', 'आ', 'इ', 'ई', 'उ', 'ऊ', 'ऋ', 'ए', 'ऐ', 'ओ', 'औ'],
+        'shift': ['क', 'ख', 'ग', 'घ', 'ङ', 'च', 'छ', 'ज', 'झ', 'ञ'],
+        'alt': ['ट', 'ठ', 'ड', 'ढ', 'ण', 'त', 'थ', 'द', 'ध', 'न'],
+        'alt-shift': ['प', 'फ', 'ब', 'भ', 'म', 'य', 'र', 'ल', 'व', 'श', 'ष']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Tamil
+$('#tamilKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['அ', 'ஆ', 'இ', 'ஈ', 'உ', 'ஊ', 'எ', 'ஏ', 'ஐ', 'ஒ', 'ஓ', 'ஔ'],
+        'shift': ['க', 'ங', 'ச', 'ஞ', 'ட', 'ண', 'த', 'ந', 'ப', 'ம'],
+        'alt': ['ய', 'ர', 'ல', 'வ', 'ழ', 'ள', 'ற', 'ன'],
+        'alt-shift': ['ஷ', 'ஸ', 'ஹ', 'க்ஷ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Kannada
+$('#kannadaKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['ಅ', 'ಆ', 'ಇ', 'ಈ', 'ಉ', 'ಊ', 'ಋ', 'ಎ', 'ಏ', 'ಐ', 'ಒ', 'ಓ', 'ಔ'],
+        'shift': ['ಕ', 'ಖ', 'ಗ', 'ಘ', 'ಙ', 'ಚ', 'ಛ', 'ಜ', 'ಝ', 'ಞ'],
+        'alt': ['ಟ', 'ಠ', 'ಡ', 'ಢ', 'ಣ', 'ತ', 'ಥ', 'ದ', 'ಧ', 'ನ'],
+        'alt-shift': ['ಪ', 'ಫ', 'ಬ', 'ಭ', 'ಮ', 'ಯ', 'ರ', 'ಲ', 'ವ', 'ಶ', 'ಷ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Gujarati
+$('#gujaratiKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['અ', 'આ', 'ઇ', 'ઈ', 'ઉ', 'ઊ', 'એ', 'ઐ', 'ઓ', 'ઔ'],
+        'shift': ['ક', 'ખ', 'ગ', 'ઘ', 'ઙ', 'ચ', 'છ', 'જ', 'ઝ', 'ઞ'],
+        'alt': ['ટ', 'ઠ', 'ડ', 'ઢ', 'ણ', 'ત', 'થ', 'દ', 'ધ', 'ન'],
+        'alt-shift': ['પ', 'ફ', 'બ', 'ભ', 'મ', 'ય', 'ર', 'લ', 'વ', 'શ', 'ષ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Malayalam
+$('#malayalamKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഊ', 'എ', 'ഏ', 'ഐ', 'ഒ', 'ഓ', 'ഔ'],
+        'shift': ['ക', 'ഖ', 'ഗ', 'ഘ', 'ങ', 'ച', 'ഛ', 'ജ', 'ഝ', 'ഞ'],
+        'alt': ['ട', 'ഠ', 'ഡ', 'ഢ', 'ണ', 'ത', 'ഥ', 'ദ', 'ധ', 'ന'],
+        'alt-shift': ['പ', 'ഫ', 'ബ', 'ഭ', 'മ', 'യ', 'ര', 'ല', 'വ', 'ശ', 'ഷ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Punjabi
+$('#punjabiKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['ਅ', 'ਆ', 'ਇ', 'ਈ', 'ਉ', 'ਊ', 'ਏ', 'ਐ', 'ਓ', 'ਔ'],
+        'shift': ['ਕ', 'ਖ', 'ਗ', 'ਘ', 'ਙ', 'ਚ', 'ਛ', 'ਜ', 'ਝ', 'ਞ'],
+        'alt': ['ਟ', 'ਠ', 'ਡ', 'ਢ', 'ਣ', 'ਤ', 'ਥ', 'ਦ', 'ਧ', 'ਨ'],
+        'alt-shift': ['ਪ', 'ਫ', 'ਬ', 'ਭ', 'ਮ', 'ਯ', 'ਰ', 'ਲ', 'ਵ', 'ਸ਼', 'ਸ', 'ਹ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Odia
+$('#odiaKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['ଅ', 'ଆ', 'ଇ', 'ଈ', 'ଉ', 'ଊ', 'ଋ', 'ଏ', 'ଐ', 'ଓ', 'ଔ'],
+        'shift': ['କ', 'ଖ', 'ଗ', 'ଘ', 'ଙ', 'ଚ', 'ଛ', 'ଜ', 'ଝ', 'ଞ'],
+        'alt': ['ଟ', 'ଠ', 'ଡ', 'ଢ', 'ଣ', 'ତ', 'ଥ', 'ଦ', 'ଧ', 'ନ'],
+        'alt-shift': ['ପ', 'ଫ', 'ବ', 'ଭ', 'ମ', 'ଯ', 'ର', 'ଲ', 'ଵ', 'ଶ', 'ଷ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+// Initialize Virtual Keyboard for Assamese
+$('#assameseKeyboard').keyboard({
+    layout: 'custom',
+    customLayout: {
+        'default': ['অ', 'আ', 'ই', 'ঈ', 'উ', 'ঊ', 'ঋ', 'এ', 'ঐ', 'ও', 'ঔ'],
+        'shift': ['ক', 'খ', 'গ', 'ঘ', 'ঙ', 'চ', 'ছ', 'জ', 'ঝ', 'ঞ'],
+        'alt': ['ট', 'ঠ', 'ড', 'ঢ', 'ণ', 'ত', 'থ', 'দ', 'ধ', 'ন'],
+        'alt-shift': ['প', 'ফ', 'ব', 'ভ', 'ম', 'য', 'র', 'ল', 'শ', 'ষ']
+    },
+    usePreview: false,
+    autoAccept: true
+});
+
+
+
+
+
+
+
+
+
+
+
+
+</script>

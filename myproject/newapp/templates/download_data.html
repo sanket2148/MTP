@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Annotations</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+    
+    main {
+        margin-left: 260px;
+        padding: 20px;
+    }
+    
+    h2 {
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table, th, td {
+        border: 1px solid #333;
+    }
+    
+    th {
+        background-color: #555;
+        color: #fff;
+        padding: 10px;
+    }
+    
+    td {
+        padding: 10px;
+    }
+    
+    .manage-language-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .manage-language-section select, .manage-language-section button {
+        padding: 10px;
+    }
+    
+    #image-display-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    #image-container img {
+        max-width: 150px;
+        height: auto;
+    }
+    
+    #folder-name-title {
+        margin-top: 20px;
+    }
+    
+    #image-upload-input {
+        display: none;
+    }
+    .folder-button {
+        display: inline-block;
+        text-align: center;
+        margin: 10px; 
+        font-family: Arial, sans-serif; 
+        cursor: pointer;
+    }
+    
+    .folder-icon {
+        width: 70px; 
+        height: 50px; 
+        background-color: #FFD700; 
+        border-radius: 10px 10px 0 0; 
+        position: relative;
+        padding: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .folder-icon img {
+        max-width: 100%; 
+        max-height: 100%; 
+        display: block;
+        margin: auto;
+    }
+    
+    .folder-label {
+        background-color: #FFD700; 
+        padding: 5px 15px;
+        border-radius: 0 0 10px 10px; 
+        font-size: 14px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    
+</style>
+<!-- #language-list {
+        display: flex;
+        flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+        justify-content: flex-start; /* This aligns items to the start of the container */
+        gap: 10px; /* This adds a gap between the items */
+    }
+    #language-list li {
+        flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+    } -->
+<body>
+    <!-- Header content goes here -->
+    <!-- Header content goes here -->
+        <header>
+            <h1>Admin Dashboard - TALKSCRIBE</h1>
+        </header>
+    
+        <nav>
+            <ul>
+                <!-- Assuming this is your existing button code -->
+                <!-- Updated button code to point to the renamed file -->
+                <li><button onclick="window.location.href='researcher.html'">Home</button></li>
+                <li><button onclick="window.location.href='check_annotation_researcher.html'">Check Annotation</button></li>
+                <li><button onclick="window.location.href='download_data.html'">Download Data</button></li>
+                <li><button onclick="window.location.href='settings.html'">Settings</button></li>
+            </ul>
+        </nav>
+    </header>
+
+<main>
+<!-- "Download Annotations" button -->
+<button onclick="displayLanguageFolders()">Download Annotations</button>
+</main>
+<!-- Modal/Container to display folders & images (hidden by default) -->
+<main>
+<div id="downloadContainer" style="display: none;">
+    <!-- Sample folder for the language "Hindi" -->
+    <div class="languageFolder">
+        <h3>Hindi</h3>
+        <input type="checkbox" class="select-all"> Select All
+        <div class="images">
+            <div class="image">
+                <img src="path/to/image1.jpg" alt="Image 1" width="100">
+                <input type="checkbox" class="image-checkbox" data-lang="Hindi" data-image="image1.jpg">
+            </div>
+            <!-- Add more images similarly -->
+        </div>
+    </div>
+    <!-- You can add more folders for other languages similarly -->
+   <button onclick="downloadSelectedAnnotations()">Download Selected</button>
+</div>
+ </main>
+<script>
+function displayLanguageFolders() {
+    document.getElementById('downloadContainer').style.display = 'block';
+}
+
+document.querySelectorAll('.select-all').forEach(selectAllCheckbox => {
+    selectAllCheckbox.addEventListener('change', function() {
+        let languageFolder = this.closest('.languageFolder');
+        let imageCheckboxes = languageFolder.querySelectorAll('.image-checkbox');
+        imageCheckboxes.forEach(chk => {
+            chk.checked = this.checked;
+        });
+    });
+});
+
+function downloadSelectedAnnotations() {
+    let selectedImages = [];
+    let checkboxes = document.querySelectorAll('.image-checkbox:checked');
+    checkboxes.forEach(chk => {
+        selectedImages.push({ lang: chk.dataset.lang, image: chk.dataset.image });
+    });
+
+    if (selectedImages.length === 0) {
+        alert('No images selected!');
+        return;
+    }
+
+    // Now, create a zip and download the selected annotations.
+    let zip = new JSZip();
+    for (let selected of selectedImages) {
+        // You'll need to fetch the actual annotation data for the selected images.
+        // For demonstration purposes, I'm assuming a static annotation text.
+        zip.file(`${selected.lang}/${selected.image}.txt`, "Sample annotation for " + selected.image);
+    }
+
+    zip.generateAsync({ type: "blob" })
+        .then(function(blob) {
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "annotations.zip";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+}
+</script>
+
+</body>
+</html>

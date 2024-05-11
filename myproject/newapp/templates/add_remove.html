@@ -1,0 +1,356 @@
+<!-- This HTML file represents the Admin Dashboard of TALKSCRIBE, a web application. Below are detailed explanations of the JavaScript functions used in this file, as well as the corresponding server-side views responsible for handling the data.
+
+1. showAnnotators(): This function is triggered when the user selects a language from the dropdown menu. It fetches annotators for the selected language from the server and dynamically updates the annotator container in the UI.
+
+   - It retrieves the selected language from the dropdown menu.
+   - It makes a fetch request to the server to get the annotators corresponding to the selected language.
+   - Upon receiving the response, it calls the updateAnnotatorContainer() function to update the UI with the fetched annotators.
+
+2. fetchAnnotators(language): This function fetches annotators for a specific language from the server. It is called internally by showAnnotators().
+
+   - It takes the selected language as input.
+   - It makes a fetch request to the server to get the annotators corresponding to the specified language.
+   - Upon receiving the response, it calls the updateAnnotatorContainer() function to update the UI with the fetched annotators.
+
+3. updateAnnotatorContainer(annotators, language): This function updates the annotator container in the UI with the fetched annotators for a specific language. It is called internally by fetchAnnotators(language).
+
+   - It takes the fetched annotators and the language as input.
+   - It clears the existing annotators in the container.
+   - It iterates through the fetched annotators and dynamically creates HTML elements to display them in the UI.
+
+4. drag(event): This function is called when an annotator is dragged. It sets the data to be transferred during the drag operation.
+
+   - It takes the event object as input.
+   - It sets the data to be transferred during the drag operation, including the annotator's name and language.
+
+5. allowDrop(event): This function is called when an annotator is dragged over a droppable area. It prevents the default behavior and adds a visual indication that the area is droppable.
+
+   - It takes the event object as input.
+   - It prevents the default behavior of the event to allow dropping.
+   - It adds a visual indication to show that the area is droppable.
+
+6. drop(event, language): This function is called when an annotator is dropped onto a droppable area. It handles the drop event, validates the language compatibility, and updates the UI accordingly.
+
+   - It takes the event object and the language as input.
+   - It prevents the default behavior of the event.
+   - It validates whether the dropped annotator is compatible with the language of the droppable area.
+   - It updates the UI by adding the dropped annotator to the assigned annotators list if compatible.
+
+7. handleAssignedAnnotatorClick(event, annotatorElement, language): This function is triggered when an assigned annotator is clicked. It prompts the user to confirm the removal of the annotator and handles the removal process.
+
+   - It takes the event object, the clicked annotator element, and the language as input.
+   - It prompts the user with a confirmation dialog to confirm the removal of the annotator.
+   - If the user confirms, it removes the annotator from the assigned annotators list and updates the UI accordingly.
+
+8. addToAvailableAnnotators(annotatorName, language): This function adds an annotator back to the available annotators list after it has been removed from the assigned annotators list.
+
+   - It takes the annotator's name and the language as input.
+   - It dynamically creates HTML elements to represent the annotator and adds them to the available annotators list.
+
+9. saveSelectedAnnotators(): This function is called when the user clicks the "Save Selection" button. It collects the selected annotators along with their associated languages and sends this data to the server for saving.
+
+   - It retrieves the selected annotators along with their associated languages from the UI.
+   - It makes a POST request to the server with the selected annotators data in JSON format.
+   - Upon receiving a response from the server, it handles the response accordingly.
+
+10. fetchAssignedAnnotators(language): This function fetches the annotators assigned to a specific language from the server and updates the UI accordingly.
+
+    - It takes the language as input.
+    - It makes a fetch request to the server to get the assigned annotators for the specified language.
+    - Upon receiving the response, it calls the updateAssignedAnnotatorContainer() function to update the UI with the fetched assigned annotators.
+
+11. updateAssignedAnnotatorContainer(assignedAnnotators, language): This function updates the container for assigned annotators in the UI with the fetched data for a specific language.
+
+    - It takes the fetched assigned annotators and the language as input.
+    - It clears the existing assigned annotators in the container.
+    - It iterates through the fetched assigned annotators and dynamically creates HTML elements to display them in the UI.
+
+Server-Side Views:
+1. get_annotators: This view is responsible for fetching annotators for a specific language from the backend database.
+2. save_selected_annotators: This view is responsible for receiving the selected annotators along with their associated languages from the frontend and saving them to the backend database.
+3. get_assigned_annotators: This view is responsible for fetching the annotators assigned to a specific language from the backend database.
+-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <script src="{% static 'js/add_remove.js' %}"></script>
+    <title>Admin Dashboard - TALKSCRIBE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        
+        #annotator-list {
+            width: 48%;
+            padding: 20px;
+            background-color: #fff;
+            max-height: 1000px;
+            overflow-y: auto;
+        }
+
+        #assigned-annotators {
+            width: 48%;
+            padding: 20px;
+            background-color: #fff;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #555;
+            color: #fff;
+        }
+        
+        .draggable {
+            cursor: move; /* Change the cursor to indicate a draggable item */
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+        }
+        
+        .droppable {
+            min-height: 150px;
+            background-color: #f1f1f1;
+            border: 2px dashed #ccc;
+        }
+        
+        .droppable.over {
+            background-color: #e7e7e7;
+            border-style: solid; /* Change border style when an item is over the drop area */
+        }
+        
+        .hidden {
+            display: none;
+        }
+        a.button {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h2>Admin Dashboard - TALKSCRIBE</h2>
+    </header>
+    <nav>
+        <ul>
+            <li><a class="button" href="{% url 'admin_home_page' %}">Home</a></li>
+            <li><a class="button" href="{% url 'add_remove' %}">Add/Remove</a></li>
+            <li><a class="button" href="{% url 'assign_task' %}">Assign Task</a></li>
+            {% comment %} <li><a class="button" href="{% url 'admin_annotation_validation' %}">Validation</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'check_annotation' %}">Check Annotation</a></li>
+            <li><a class="button" href="{% url 'start_annotation' %}">Start Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_admin' %}">Download Data</a></li> {% endcomment %}
+            {% comment %} <li><a class="button" href="{% url 'api_settings' %}">API Settings</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings' %}">Settings</a></li>
+        </ul>
+    </nav>
+    <main>
+        <!-- Dropdown to select language -->
+        <div id="language-selector">
+            
+        </div>
+
+        <!-- Annotator list -->
+        <div id="annotator-list">
+            <label for="language-dropdown">Select Language:</label>
+            <select id="language-dropdown" onchange="showAnnotators()">
+                <option value="">Select a language</option>
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Telugu">Telugu</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Kannada">Kannada</option>
+                    <option value="Malayalam">Malayalam</option>
+                    <option value="Marathi">Marathi</option>
+                    <option value="Gujarati">Gujarati</option>
+                    <option value="Bengali">Bengali</option>
+                    <option value="Punjabi">Punjabi</option>
+                    <option value="Odia">Odia</option>
+                    <option value="Assamese">Assamese</option>
+                <!-- Add other languages here -->
+                
+            </select>
+            <h2>Annotators</h2>
+            <div id="annotator-container">
+                <!-- Annotators will be dynamically added here -->
+            </div>
+        </div>
+
+        
+
+        <!-- Assigned annotators with separate containers for each language -->
+        <div id="assigned-annotators">
+            <button id="save-selection-button" onclick="saveSelectedAnnotators()" style="background: green">Save Selection</button>
+            <h2>Assigned Annotators</h2>
+            <br>
+            <h3>English Annotators</h3>
+            <div id="English" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'English')">
+                
+
+                <!-- English annotators will be dynamically added here -->
+            </div>
+            <br><h3>Hindi Annotators</h3>
+            <div id="Hindi" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Hindi')">
+                
+                 
+            </div>
+            <br><h3>Telugu Annotators</h3>
+            <div id="Telugu" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Telugu')">
+                
+            </div> <br><h3>Tamil Annotators</h3>
+            <div id="Tamil" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Tamil')">
+                
+                 
+            </div>
+            <br><h3>Kannada Annotators</h3>
+            <div id="Kannada" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Kannada')">
+                
+                 
+            </div><br><h3>Malayalam Annotators</h3>
+            <div id="Malayalam" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Malayalam')">
+                
+                 
+            </div><br><h3>Marathi Annotators</h3>
+            <div id="Marathi" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Marathi')">
+                
+                 
+            </div><br><h3>Gujarati Annotators</h3>
+            <div id="Gujarati" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Gujarati')">
+                
+                 
+            </div><br><h3>Bengali Annotators</h3>
+            <div id="Bengali" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Bengali')">
+                
+                 
+            </div><br><h3>Punjabi Annotators</h3>
+            <div id="Punjabi" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Punjabi')">
+                
+                 
+            </div><br><h3>Odia Annotators</h3>
+            <div id="Odia" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Odia')">
+                
+                 
+            </div><br><h3>Assamese Annotators</h3>
+            <div id="Assamese" class="droppable" ondragover="allowDrop(event)" ondrop="drop(event, 'Assamese')">
+                
+                 
+            </div><br>
+            
+        </div>
+    </main>
+
+
+    
+
+    
+</body>
+</html>
+ 
+<!-- explain me the java scripts
+    function saveSelectedAnnotators() {
+    var selectedAnnotatorUsernames = [];
+    var selectedLanguageId = document.getElementById('language-dropdown').value;
+    // Collect the IDs of selected annotators
+    var selectedAnnotatorElements = document.querySelectorAll('.dropped');
+    var assignedContainer = document.getElementById(`${language}`);
+    selectedAnnotatorElements.forEach(function(element) {
+        selectedAnnotatorUsernames.push({
+            username: element.textContent,
+            language: assignedContainer  // Send the ID of the dropped area as the language ID
+        });
+    });
+
+    console.log('Selected Annotators:', selectedAnnotatorUsernames);  // Add this line for debugging
+
+    // Send the selected annotator IDs to the server
+    fetch('/newapp/save_selected_annotators/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+            selected_annotators: selectedAnnotatorUsernames
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message); // Handle the server's response as needed
+    })
+    .catch(error => console.error('Error saving selected annotators:', error));
+} -->

@@ -1,0 +1,406 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/researcher.js' %}"></script>
+    <title>Annotator Page</title>
+    <!-- Include CSS and other header information here -->
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+    
+    main {
+        margin-left: 260px;
+        padding: 20px;
+    }
+    
+    h2 {
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table, th, td {
+        border: 1px solid #333;
+    }
+    
+    th {
+        background-color: #555;
+        color: #fff;
+        padding: 10px;
+    }
+    
+    td {
+        padding: 10px;
+    }
+    
+    .manage-language-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .manage-language-section select, .manage-language-section button {
+        padding: 10px;
+    }
+    
+    #image-display-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    #image-container img {
+        max-width: 150px;
+        height: auto;
+    }
+    
+    #folder-name-title {
+        margin-top: 20px;
+    }
+    
+    #image-upload-input {
+        display: none;
+    }
+    .folder-button {
+        display: inline-block;
+        text-align: center;
+        margin: 10px; 
+        font-family: Arial, sans-serif; 
+        cursor: pointer;
+    }
+    
+    .folder-icon {
+        width: 70px; 
+        height: 50px; 
+        background-color: #FFD700; 
+        border-radius: 10px 10px 0 0; 
+        position: relative;
+        padding: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .folder-icon img {
+        max-width: 100%; 
+        max-height: 100%; 
+        display: block;
+        margin: auto;
+    }
+    
+    .folder-label {
+        background-color: #FFD700; 
+        padding: 5px 15px;
+        border-radius: 0 0 10px 10px; 
+        font-size: 14px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    #language-list {
+        display: flex;
+        flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+        justify-content: flex-start; /* This aligns items to the start of the container */
+        gap: 10px; /* This adds a gap between the items */
+    }
+    #language-list li {
+        flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+    }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    header {
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+    }
+    
+    nav {
+        width: 250px;
+        position: fixed;
+        height: 100%;
+        background-color: #333;
+        overflow: auto;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    nav ul li {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid #555;
+    }
+    
+    nav ul li button {
+        width: 100%;
+        padding: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        transition: background-color 0.3s;
+    }
+    
+    nav ul li button:hover {
+        background-color: #555;
+    }
+main {
+    margin-left: 260px;
+    padding: 20px;
+}
+
+h2 {
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #333;
+}
+
+th {
+    background-color: #555;
+    color: #fff;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+}
+
+.manage-language-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.manage-language-section select, .manage-language-section button {
+    padding: 10px;
+}
+
+#image-display-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#image-container img {
+    max-width: 150px;
+    height: auto;
+}
+
+#folder-name-title {
+    margin-top: 20px;
+}
+
+#image-upload-input {
+    display: none;
+}
+.folder-button {
+    display: inline-block;
+    text-align: center;
+    margin: 10px; 
+    font-family: Arial, sans-serif; 
+    cursor: pointer;
+}
+
+.folder-icon {
+    width: 70px; 
+    height: 50px; 
+    background-color: #FFD700; 
+    border-radius: 10px 10px 0 0; 
+    position: relative;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon img {
+    max-width: 100%; 
+    max-height: 100%; 
+    display: block;
+    margin: auto;
+}
+
+.folder-label {
+    background-color: #FFD700; 
+    padding: 5px 15px;
+    border-radius: 0 0 10px 10px; 
+    font-size: 14px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+#language-list {
+    display: flex;
+    flex-wrap: wrap; /* This ensures that items wrap onto the next line when there's no space left */
+    justify-content: flex-start; /* This aligns items to the start of the container */
+    gap: 10px; /* This adds a gap between the items */
+}
+#language-list li {
+    flex: 0 0 auto; /* This ensures that items don't grow or shrink, and they don't break to multiple lines */
+}
+
+a.button {
+    display: block;
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+a.button:hover {
+    background-color: #555;
+}
+
+
+#gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+}
+
+.gallery-image {
+  width: 100%;
+  object-fit: cover;
+}
+#image-gallery div {
+    /* Style each image wrapper */
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+}
+</style>
+<body>
+    <!-- Header or navbar if any -->
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Researcher Dashboard - TALKSCRIBE</h1>
+    </header>
+
+    <nav>
+        <ul>            
+            <li><a class="button" href="{% url 'researcher'%}">Home</a></li>
+            <li><a class="button" href="{% url 'check_annotation_researcher'%}">Check Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_researcher'%}">Download Data</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings_researcher'%}">Settings</a></li>
+        </ul>
+    </nav>
+
+
+
+<script></script>
+    <!-- Footer or other information -->
+
+    <!-- Include JavaScript and other footer scripts here -->
+</body>
+<body>
+
+
+    <main>
+        <section>
+            {% comment %} <h2>Languages Overview</h2>
+            <table>
+              <thead>
+                  <tr>
+                      <th>Language</th>
+                      <th>No. of Annotations</th>
+                      <th>No. of Images</th>
+                  </tr>
+              </thead> {% endcomment %}
+              <h2>Language Folders</h2>
+                <ul id="language-list">            
+                    <!-- ... Other pre-existing languages ... -->
+                    {% for language in languages %}
+                        <div class="language-folder">
+                            <a href="{% url 'language_folder_researcher' language_name=language.name %}" class="folder-button-link">                                
+                                <div class="folder-button">
+                                        <div class="folder-icon">
+                                            <img src="{% static 'images/wired-outline-54-photo-picturelandscape-gallery.gif' %}" alt="Folder Icon">
+                                        </div>
+                                    <div class="folder-label">{{ language.name }}</div>
+                                </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </ul>
+          </table>
+        </section>
+
+        
+
+
+
+    </main>
+
+    
+
+
+</html>

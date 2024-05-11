@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Annotation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        nav {
+            width: 250px;
+            position: fixed;
+            height: 100%;
+            background-color: #333;
+            overflow: auto;
+        }
+        
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        nav ul li {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #555;
+        }
+        
+        nav ul li button {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li button:hover {
+            background-color: #555;
+        }
+        
+        main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+        
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid #333;
+        }
+        
+        th {
+            background-color: #555;
+            /*color: #fff;*/
+            padding: 10px;
+        }
+        
+        td {
+            padding: 10px;
+        }
+        
+        .manage-language-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manage-language-section select, .manage-language-section button {
+            padding: 10px;
+        }
+        
+        #image-display-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        #image-container img {
+            max-width: 150px;
+            height: auto;
+        }
+        
+        #folder-name-title {
+            margin-top: 20px;
+        }
+        
+        
+        nav {
+            float: left;
+        }
+        main {
+            float: left;
+            width: calc(100% - 260px); /* to compensate for the nav width */
+            overflow: hidden; /* for clearfix */
+        }
+        .language-section {
+            padding: 10px 0;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+
+        table {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-collapse: collapse;
+        }
+        
+        table, th, td {
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        
+        
+        
+        
+        .layout-container {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .left-container {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-container {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .table-container {
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .image-item {
+            width: 150px;
+            height: 150px;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ccc;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #annotatorList, #imageList {
+            list-style-type: none;
+            padding: 0;
+        }
+        #imageSection {
+            display: grid;
+           /*  grid-template-columns: repeat(4, 1fr); Adjust number of columns as needed */
+            gap: 10px;
+        }
+        #imageSection img {
+            width: 100%; /* Adjust width as needed */
+            height: auto; /* Adjust height as needed */
+        }
+
+
+
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .section {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #annotatorList, #imageList{
+            display: grid;
+           /*  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); Creates as many columns as can fit */
+            gap: 10px; /* Adjust the gap as needed */
+        }
+        #imageSection {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Adjust number of columns as needed */
+            gap: 10px;
+        }
+        #imageSection img {
+            width: 100%; /* Adjust width as needed */
+            height: auto; /* Adjust height as needed */
+        }
+
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Three images per row */
+            gap: 10px;
+            margin-bottom: 20px; /* Space before the table */
+        }
+        
+        .image-gallery img {
+            width: 100%; /* Adjust as needed */
+            border: 1px solid #ccc; /* Example border */
+            padding: 5px; /* Example padding */
+        }
+        
+        #annotationsTable {
+            width: 100%; /* Full width of the section */
+            border-collapse: collapse;
+        }
+        
+        #annotationsTable th, #annotationsTable td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        #annotationsTable th {
+            background-color: #f2f2f2;
+        }
+        
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        
+        .left-section, .right-section {
+            flex: 1;
+            margin: 10px;
+        }
+        
+        /* Style for the search bar, radio buttons, list, and gallery */
+        #searchInput {
+            margin-bottom: 10px;
+        }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Adjust based on your desired column count */
+            gap: 10px;
+        }
+        
+        .image-gallery img {
+            width: 100%;
+            cursor: pointer;
+            /* Additional styles for the images */
+        }
+        
+        #annotationsTable {
+            width: 100%;
+            /* Additional styles for the table */
+        }
+        
+        /* Additional styles for the list of annotators */
+        #annotatorList {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .slide-section {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+        }
+        
+        #annotatorList li,
+        #imageGallery img {
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+
+
+
+
+        .slider-section {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 0;
+        }
+        
+        .slider-section img {
+            display: inline-block;
+            margin-right: 10px;
+            /* Additional image styles */
+        }
+        
+        .slider-section li {
+            display: inline-block;
+            margin-right: 10px;
+            /* Additional list item styles */
+        }
+        
+        
+        .slider-section {
+            scrollbar-width: thin; /* Thinner scrollbar */
+            scrollbar-color: #888 #f4f4f4; /* Custom scrollbar colors */
+        }
+        
+        /* For Webkit browsers */
+        .slider-section::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .slider-section::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+        
+        .slider-section::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+
+        .container {
+            display: flex;
+            max-width: 1200px; /* or 100% for full width */
+            margin: 0 auto; /* Center the container */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .left-section {
+            flex: 3; /* Takes 3 parts of the available space */
+            padding-right: 20px; /* Spacing between sections */
+            border-right: 2px solid #333; /* Line separating the sections */
+        }
+        
+        .right-section {
+            flex: 2; /* Takes 2 parts of the available space */
+            padding-left: 20px; /* Spacing between sections */
+        }
+        
+        /* Styles for search and radio button area */
+        .search-and-filter {
+            margin-bottom: 20px;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box; /* Include padding in the input's width */
+        }
+        
+        /* Radio buttons styling */
+        .radio-buttons {
+            margin-bottom: 10px;
+        }
+        
+        /* Styling for the image gallery */
+        #imageSection {
+            display: grid;
+           /* grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));  Responsive grid for images */
+            gap: 10px;
+        }
+        
+        #imageSection img {
+            display: grid;
+            /* grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); Creates a responsive grid */
+            grid-gap: 10px; /* Space between items */
+            padding: 10px; /* Padding around the grid */
+            max-width: 100px; /* Images take up the full width of the grid column */
+            padding: 5px; /* Padding around images */
+            border: 1px solid #ccc; /* Border for images */
+            cursor: pointer; /* Indicates the images are clickable */
+        }
+        
+        /* Styling for the annotations table */
+        #annotationsTable, #userAnnotations {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px; /* Space after the radio buttons */
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #ddd; /* Lighter border for the table */
+        }
+        
+        th {
+            background-color: #f4f4f4f4;
+        }
+        
+        /* Scrollable list container */
+        #annotatorList, #imageGallery {
+            max-height: 400px; /* Set a maximum height */
+            overflow: auto; /* Enable scrolling */
+            margin-bottom: 20px; /* Space below the list */
+            padding-right: 5px; /* Prevents scrollbar from overlaying content */
+        }
+        
+        /* Scrollable table */
+        #annotationsTable, #userAnnotations {
+            max-height: 600px; /* Set a maximum height */
+            overflow: auto; /* Enable scrolling */
+            display: block; /* Change table display to block to allow height */
+        }
+        
+        /* Scrollable image section */
+        #imageSection {
+            max-height: 600px; /* Set a maximum height */
+            overflow: auto; /* Enable scrolling */
+        }
+        
+        #imageSection {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Creates as many columns as can fit while being at least 150px */
+            gap: 10px; /* Adjust the gap as needed */
+            padding: 10px;
+        }
+        
+        .gallery-image {
+            width: 100%; /* Images take up the full width of the column */
+            object-fit: cover; /* Resize the image to maintain aspect ratio while filling the element */
+            cursor: pointer; /* Indicates the images are clickable */
+            transition: transform 0.3s ease; /* Animation for hover effect */
+            border-radius: 4px; /* Optional: rounded corners for aesthetics */
+        }
+        
+        .gallery-image:hover {
+            transform: scale(1.1); /* Slightly enlarge images on hover */
+        }
+        
+        a.button {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        a.button:hover {
+            background-color: #555;
+        }
+        
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Welcome to TALKSCRIBE, {{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <h1>Researcher Dashboard - TALKSCRIBE</h1>
+    </header>
+    <nav>
+        <ul>            
+            <li><a class="button" href="{% url 'researcher'%}">Home</a></li>
+            <li><a class="button" href="{% url 'check_annotation_researcher'%}">Check Annotation</a></li>
+            {% comment %} <li><a class="button" href="{% url 'download_data_researcher'%}">Download Data</a></li> {% endcomment %}
+            <li><a class="button" href="{% url 'settings_researcher'%}">Settings</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h2>Check Annotation</h2>
+
+        <label>Select Language:</label>
+            <select id="languageSelect">
+                <option value="">--Select a language--</option>
+                        <option value="English">English</option>
+                        <option value="Hindi">Hindi</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Kannada">Kannada</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Marathi">Marathi</option>
+                        <option value="Gujarati">Gujarati</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Punjabi">Punjabi</option>
+                        <option value="Odia">Odia</option>
+                        <option value="Assamese">Assamese</option>
+                <!-- Add other languages as needed -->
+
+            </select>
+        
+        
+
+        <div class="container">
+            <!-- Left Section for Annotators or Image Gallery -->
+            <div class="left-section">
+                <!-- Search Bar -->
+                <input type="text" id="searchInput" placeholder="Search...">
+                
+                <!-- Selection Buttons -->
+                <div>
+                    <input type="radio" id="byAnnotator" name="checkAnnotation" value="annotator" onclick="toggleListDisplay('annotator')">
+                    <label for="byAnnotator">Select by Annotator</label>
+                    <input type="radio" id="byImage" name="checkAnnotation" value="image" onclick="toggleListDisplay('image')">
+                    <label for="byImage">Select by Image</label>
+                </div>
+                
+                <!-- Annotator List Section -->
+                <div id="annotatorSection" class="slide-section" style="/*display: none;*/" >
+                    
+                        <ul id="annotatorList"> <!-- Annotator list items go here --> </ul>
+                        {% comment %} <div id="imageGallery"> <!-- Image items go here --> </div> {% endcomment %}
+                    
+                </div>
+        
+                <!-- Image Gallery Section -->
+                <div id="imageSection" class="slide-section" style="/*display: none;*/" >
+                    
+                        
+                </div>
+            </div>
+        
+            <!-- Right Section for Annotations Table -->
+            <div class="right-section">
+                <button id="downloadButton">Download Annotations</button>
+                <button id="downloadAllButton">Download All Annotations</button>
+
+                <div id="annotationTableSection">
+                    <table id="userAnnotations" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Annotation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Annotation data will be populated here by the displayUserAnnotations function -->
+                        </tbody>
+                        
+                    </table>
+                    <table id="imageAnnotations" style="display: none;">
+                        <!-- Image annotations table structure -->
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Annotation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Rows for image annotations will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+             
+   
+</main>
+    
+    
+<script>
+        const annotations = {};
+        const languageSelect = document.getElementById('languageSelect');
+        let selectedLanguage = ''; // Initialize with an empty string
+
+        // Add an event listener to the language dropdown to update the selectedLanguage variable
+        languageSelect.addEventListener('change', function () {
+            selectedLanguage = languageSelect.value;
+            if (selectedLanguage) {
+                fetch(`/newapp/get_annotation_data_researcher/${selectedLanguage}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const { annotators, images, data: annotationData } = data;
+
+                        // Now you can use the fetched data to update your JavaScript variables
+                        annotations[selectedLanguage] = {
+                            annotators,
+                            images,
+                            data: annotationData,
+                        };
+                        console.log(annotations)
+                        // Call a function to update your UI or perform any other actions with the fetched data
+                        updateUI();
+                        loadAnnotations();
+                        resetAll()
+                    })
+                    .catch(error => console.error('Error fetching data:', error));
+            }
+        });
+
+        // Function to update UI based on the selected language
+        function updateUI() {
+            // Implement your logic to update the UI based on the fetched data for the selected language
+            console.log(`Update UI for ${selectedLanguage}`);
+        }
+        
+
+    //const languageSelect = document.getElementById('languageSelect');
+        languageSelect.addEventListener('change', () => {
+        resetAll();  // Reset all before loading annotations for the selected language
+        loadAnnotations();
+    });
+
+    document.getElementById('searchInput').addEventListener('keyup', filterList);
+
+    function toggleListDisplay(selectionType) {
+        const annotatorSection = document.getElementById('annotatorSection');
+        const imageSection = document.getElementById('imageSection');
+        // Make sure these IDs exist in your HTML and are unique
+        if (selectionType === 'annotator') {
+            annotatorSection.style.display = 'block';
+            imageSection.style.display = 'none';
+        } else {
+            annotatorSection.style.display = 'none';
+            imageSection.style.display = '';
+        }
+    }
+    
+    function toggleTableVisibility(tableToShow) {
+        const userAnnotationsTable = document.getElementById('userAnnotations');
+        const imageAnnotationsTable = document.getElementById('imageAnnotations');
+    
+        if (tableToShow === 'userAnnotations') {
+            userAnnotationsTable.style.display = 'block';
+            imageAnnotationsTable.style.display = 'none';
+        } else if (tableToShow === 'imageAnnotations') {
+            userAnnotationsTable.style.display = 'none';
+            imageAnnotationsTable.style.display = 'block';
+        }
+    }
+    
+    // Example usage:
+    // Call this function when you want to toggle to the userAnnotations table
+   
+    
+    // Call this function when you want to toggle to the imageAnnotations table
+    
+    
+    
+    
+    
+
+    function resetAll() {
+        var userAnnotations = document.getElementById('userAnnotations');
+        var downloadUserAnnotations = document.getElementById('downloadUserAnnotations');
+        var imageAnnotations = document.getElementById('imageAnnotations');
+        var downloadImageAnnotations = document.getElementById('downloadImageAnnotations');
+    
+        if (userAnnotations) userAnnotations.style.display = 'none';
+        if (downloadUserAnnotations) downloadUserAnnotations.style.display = 'none';
+        if (imageAnnotations) imageAnnotations.style.display = 'none';
+        if (downloadImageAnnotations) downloadImageAnnotations.style.display = 'none';
+    }
+    function filterList() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const items = document.querySelectorAll('.section ul li');
+        items.forEach(item => {
+            if (item.textContent.toLowerCase().indexOf(searchValue) > -1) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+
+
+    function populateAnnotatorList(annotators) {
+        const annotatorList = document.getElementById('annotatorList');
+        annotatorList.innerHTML = ''; // Clear any existing list items
+    
+        annotators.forEach(annotator => {
+            let li = document.createElement('li');
+            li.textContent = annotator; // If 'annotator' is just a string
+            // If 'annotator' is an object, use `annotator.name` or the appropriate property
+    
+            li.addEventListener('click', function() {
+                displayUserAnnotations(language, annotator); // Make sure to use the correct language variable
+            });
+    
+            annotatorList.appendChild(li);
+        });
+    }
+    
+
+    function showSelection(selectionType) {
+        if (selectionType === 'annotator') {
+            // Logic to load and display the list of annotators
+            loadAnnotators();
+        } else if (selectionType === 'image') {
+            // Logic to load and display the image gallery
+            loadImageGallery();
+        }
+    }
+
+    let isFirstLoad = true;
+    function loadAnnotations() {
+        const selectedLanguage = languageSelect.value;
+        if (!annotations[selectedLanguage]) {
+            if (!isFirstLoad) { // Only show the alert if it's not the first load
+                alert('No data available for selected language');
+            }
+            return;
+        }
+
+        isFirstLoad = false;
+            
+        // Load annotators
+        const annotatorList = document.getElementById('annotatorList');
+        annotatorList.innerHTML = ''; // Clear existing
+        annotations[selectedLanguage].annotators.forEach(user => {
+            let li = document.createElement('li');
+            li.textContent = user;
+            li.onclick = function() {
+                displayUserAnnotations(selectedLanguage, user);
+            };
+            annotatorList.appendChild(li);
+        });
+    
+        // Load images
+        const imageSection = document.getElementById('imageSection');
+    imageSection.innerHTML = ''; // Clear existing
+    annotations[selectedLanguage].images.forEach(imgSrc => {
+        let img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = "Demo Image";
+        img.className = 'demo-image';
+        img.onclick = function() {
+            displayImageAnnotations(selectedLanguage, img.src);
+        };
+        imageSection.appendChild(img); // Append the image directly to the imageSection
+    });
+    }
+    
+    function displayUserAnnotations(language, user) {
+        // Grab the table for user annotations
+        const table = document.getElementById('userAnnotations');
+        if (!table) {
+            console.error('Table #userAnnotations not found.');
+            return; // Exit the function if the table isn't found
+        }
+    
+        // Clear the table body
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear any existing rows
+    
+        // Assuming 'annotations' is an object containing your annotation data
+        annotations[language].data[user].forEach(annotation => {
+            let tr = document.createElement('tr');
+            let imgTd = document.createElement('td');
+            let img = document.createElement('img');
+            img.src = annotation.img;
+            img.className = 'demo-image';
+            img.alt = 'Annotation Image';
+            imgTd.appendChild(img);
+            tr.appendChild(imgTd);
+    
+            let annotationTd = document.createElement('td');
+            annotationTd.textContent = annotation.annotation;
+            tr.appendChild(annotationTd);
+    
+            tbody.appendChild(tr);
+        });
+    
+        // Display the table
+        table.style.display = 'block'; 
+        toggleTableVisibility('userAnnotations');
+    }
+    
+    
+    function displayImageAnnotations(language, imgSrc) {
+        // Grab the table for image annotations
+        const table = document.getElementById('imageAnnotations');
+        if (!table) {
+            console.error('Table #imageAnnotations not found.');
+            return; // Exit the function if the table isn't found
+        }
+    
+        // Clear the table body
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = ''; // Clear any existing rows
+    
+        // Fetch the image annotations based on the selected image
+        for (let user in annotations[language].data) {
+            annotations[language].data[user].forEach(annotation => {
+                // Convert both paths to relative paths for comparison
+                const relativeImgSrc = imgSrc.replace(/^.*[\\\/]/, '');
+                const relativeAnnotationImg = annotation.img.replace(/^.*[\\\/]/, '');
+    
+                if (relativeImgSrc === relativeAnnotationImg) {
+                    let tr = document.createElement('tr');
+                    
+                    // Display the user's name in the first column
+                    let userTd = document.createElement('td');
+                    userTd.textContent = user;
+                    tr.appendChild(userTd);
+    
+                    /*let imgTd = document.createElement('td');
+                    let img = document.createElement('img');
+                    img.src = annotation.img;
+                    img.className = 'demo-image';
+                    img.alt = 'Annotation Image';
+                    imgTd.appendChild(img);
+                    tr.appendChild(imgTd);*/
+    
+                    let annotationTd = document.createElement('td');
+                    annotationTd.textContent = annotation.annotation;
+                    tr.appendChild(annotationTd);
+    
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+    
+        // Display the image annotations table
+        table.style.display = 'block';
+        toggleTableVisibility('imageAnnotations');
+    }
+    
+    
+    
+    
+    
+    
+
+    function downloadCSV(tableId, filename) {
+        const table = document.getElementById(tableId);
+        const rows = table.querySelectorAll("tr");
+        let csv = [];
+    
+        for(let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll("td, th");
+            
+            for(let j = 0; j < cols.length; j++) {
+                let data = cols[j].innerText.replace(/"/g, '""'); // Escape double quotes
+                data = '"' + data + '"'; // Quote each entry
+                row.push(data);
+            }
+    
+            csv.push(row.join(","));
+        }
+    
+        const csvString = csv.join("\n");
+        const blob = new Blob([csvString], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+    
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function downloadMultipleAnnotations() {
+        // Collect all selected user IDs and image IDs
+        let selectedUsers = [...document.getElementById("annotatorList").selectedOptions].map(opt => opt.value);
+        let selectedImages = [...document.getElementById("imageList").selectedOptions].map(opt => opt.value);
+    
+        // Fetch and combine annotations for all selected users and images
+        let combinedAnnotations = [];
+    
+        for(let userId of selectedUsers) {
+            // Fetch annotations for the user
+            let userAnnotations = getUserAnnotationsById(userId); // You would need to implement this or similar function
+            combinedAnnotations.push(...userAnnotations);
+        }
+    
+        for(let imageId of selectedImages) {
+            // Fetch annotations for the image
+            let imageAnnotations = getImageAnnotationsById(imageId); // You would need to implement this or similar function
+            combinedAnnotations.push(...imageAnnotations);
+        }
+    
+        // Convert combinedAnnotations to CSV and download
+        downloadAnnotationsAsCSV(combinedAnnotations, 'combined_annotations.csv');
+    }
+    function slide(direction) {
+    var container = document.getElementById('sliderContainer');
+    scrollCompleted = 0;
+    var slideVar = setInterval(function(){
+        if(direction == 'left') {
+            container.scrollLeft -= 10;
+        } else {
+            container.scrollLeft += 10;
+        }
+        scrollCompleted += 10;
+        if(scrollCompleted >= 100) {
+            window.clearInterval(slideVar);
+        }
+    }, 50);
+    }
+
+    function loadUsersForLanguage(language) {
+        // Fetch users for the given language and populate the annotatorList with checkboxes
+        let users = getUsersForLanguage(language); // This function should return a list of users for the given language
+    
+        let userListElement = document.getElementById('annotatorList');
+        userListElement.innerHTML = '';
+        
+        for (let user of users) {
+            let listItem = document.createElement('li');
+            let checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = user.id;
+            checkbox.id = 'user_' + user.id;
+            
+            let label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = user.name;
+    
+            listItem.appendChild(checkbox);
+            listItem.appendChild(label);
+            userListElement.appendChild(listItem);
+        }
+    
+        // Show the download button
+        document.getElementById('downloadUserAnnotations').style.display = 'block';
+    }
+    
+    function loadImagesForLanguage(language) {
+        // Similar function to load images for the given language and populate imageList with checkboxes
+        //...
+        // Show the download button
+        document.getElementById('downloadImageAnnotations').style.display = 'block';
+    }
+
+    // Initial load
+    loadAnnotations();
+</script>
+
+<script>
+    {% comment %} function fetchAnnotatorsForLanguage(languageName) {
+        fetch(`/get-annotators-for-language?language_name=${languageName}`)
+        .then(response => response.json())
+        .then(data => {
+            const annotatorsList = document.getElementById('annotatorList');
+            annotatorsList.innerHTML = ''; // Clear existing list
+            data.annotators.forEach(annotator => {
+                const li = document.createElement('li');
+                li.textContent = annotator.username;
+                li.setAttribute('data-annotator-id', annotator.id);
+                li.addEventListener('click', () => {
+                    fetchAnnotationsByAnnotator(annotator.id);
+                });
+                annotatorsList.appendChild(li);
+            });
+        });
+    }
+
+    function fetchAnnotationsByAnnotator(annotatorId) {
+        fetch(`/get-annotations-by-annotator/${annotatorId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Use `data` to update your front-end
+            // This could involve displaying the images and annotations in the format you've set up in your HTML
+        });
+    } {% endcomment %}
+    
+    
+
+    // Add an event listener to the download all button
+document.getElementById('downloadAllButton').addEventListener('click', function() {
+    // Call the function to download all annotations for the selected language
+    downloadAllAnnotations();
+});
+
+// Function to download all annotations for the selected language
+function downloadAllAnnotations() {
+    const selectedLanguage = languageSelect.value; // Assuming languageSelect is your language dropdown
+
+    // Check if a language is selected
+    if (!selectedLanguage) {
+        alert('Please select a language first.');
+        return;
+    }
+
+    // Fetch annotations for the selected language
+    fetch(`/newapp/get_annotation_data/${selectedLanguage}/`)
+        .then(response => response.json())
+        .then(data => {
+            const { annotators, images, data: annotationData } = data;
+
+            // Combine all annotations for the selected language into a single array
+            const allAnnotations = [].concat(...Object.values(annotationData).map(arr => arr));
+
+            // Create a CSV string from the combined annotations
+            const csvContent = allAnnotations.map(annotation => {
+                return `${annotation.img},${annotation.annotation}`;
+            }).join('\n');
+
+            // Create a Blob and create a link to trigger the download
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = `all_annotations_${selectedLanguage}.csv`;
+
+            // Append the link to the document and trigger the click event
+            document.body.appendChild(link);
+            link.click();
+
+            // Remove the link from the document
+            document.body.removeChild(link);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+// Add an event listener to the download button
+document.getElementById('downloadButton').addEventListener('click', function() {
+    // Call the function to download annotations
+    downloadAnnotations();
+});
+
+// Function to download annotations from the table
+function downloadAnnotations() {
+    // Get the table element
+    const table = document.getElementById('userAnnotations'); // Update with your table ID
+
+    // Create a CSV string from the table data
+    const csvContent = Array.from(table.querySelectorAll('tr')).map(row => {
+        const columns = Array.from(row.children).map(column => column.innerText);
+        return columns.join(',');
+    }).join('\n');
+
+    // Create a Blob and create a link to trigger the download
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = 'annotations.csv';
+
+    // Append the link to the document and trigger the click event
+    document.body.appendChild(link);
+    link.click();
+
+    // Remove the link from the document
+    document.body.removeChild(link);
+}
+
+    
+    
+    
+</script>
+
+</body>
+
+</html>

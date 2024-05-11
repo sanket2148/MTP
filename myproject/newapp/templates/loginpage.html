@@ -1,0 +1,130 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Talk-Scribe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .login-container {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #e1e1e1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-container h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        input[type="text"], input[type="password"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #e1e1e1;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .options a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+        
+        .options a:hover {
+            text-decoration: underline;
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Talk-Scribe</h1>
+    </header>
+
+    <div class="login-container">
+        <h2>Login/Sign-in</h2>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <form id="loginForm" action="{% url 'loginpage' %}" method="post">
+
+            <!-- Role Selector -->
+            {% csrf_token %}
+            <div>
+                <label for="userRole">Select Role:</label>
+                <select id="userRole" name="user_role" required>
+                    <option value="admin">Admin</option>
+                    <option value="annotator">Annotator</option>
+                    <option value="researcher">Researcher</option>
+                    <option value="validator">Validator</option>
+                </select>
+            </div>
+            
+            <!-- Username Input -->
+            <input type="text" name="username" placeholder="Username or Email" required>
+            <input type="password" name="password" placeholder="Password" required> 
+            <!-- Options -->
+            <div class="options">
+                <!-- It's good practice to associate the label with the input by using the 'for' attribute -->
+                <label for="rememberPassword"><input type="checkbox" id="rememberPassword" name="remember_password"> Remember Password</label>
+                <!-- Ensure the link to the password reset page is correct -->
+                <a href="{% url 'forgot_password' %}">Forgot Password?</a>
+
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit">Login</button>
+            
+            <!-- Sign Up Link -->
+            <p>Don't Have an Account? <a href="{% url 'create_account' %}">Sign Up</a></p>
+        </form>
+    </div>
+</body>
+ 
+
+
+
+</html>
