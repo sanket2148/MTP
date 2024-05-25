@@ -157,14 +157,14 @@ In the `settings.py` file, you'll find a section dedicated to configuring the da
 If you encounter any issues, please refer to the Django documentation [here](https://docs.djangoproject.com/en/5.0/).
 
 ## Authors
-SAnket D Avaralli -- Email -(mailto:sanketavaralli321@gmail.com)
+Sanket D Avaralli -- Email -(mailto:sanketavaralli321@gmail.com)
 
 ## Version History
 * 0.1 - Initial release
 
 ## License
-This project is licensed under the XYZ License - see the `LICENSE.md` file for details
+Still need to be licensed.
 
 ## Acknowledgments
 * Django Team for the comprehensive framework
-* All contributors and maintainers who have worked on this project
+* Dr. Narayanan (CK) C Krishnan , Associate Professor , Data Science
